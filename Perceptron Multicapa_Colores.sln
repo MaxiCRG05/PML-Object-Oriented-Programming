@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35222.181
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Perceptron Multicapa_Colores", "Perceptron Multicapa_Colores.csproj", "{A69B3697-4D39-43AA-8FD2-CF86736E9BCE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A69B3697-4D39-43AA-8FD2-CF86736E9BCE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A69B3697-4D39-43AA-8FD2-CF86736E9BCE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A69B3697-4D39-43AA-8FD2-CF86736E9BCE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A69B3697-4D39-43AA-8FD2-CF86736E9BCE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {069B3390-4796-4530-98F5-3FCF6ABAA242}
+	EndGlobalSection
+EndGlobal
