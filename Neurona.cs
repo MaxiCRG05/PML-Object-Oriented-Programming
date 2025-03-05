@@ -20,7 +20,7 @@ namespace Perceptron_Multicapa_Colores
 		/// <param name="numeroPesos">Número de pesos (conexiones con la capa anterior).</param>
 		public Neurona(string nombre, int numeroPesos)
 		{
-			Console.Write("lol");
+			Console.Write("lolololololol");
 			Nombre = nombre;
 			if (numeroPesos > 0)
 			{
