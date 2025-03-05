@@ -37,6 +37,7 @@ namespace Perceptron_Multicapa_Colores
 
 		/// <summary>
 		/// Método constructor de la clase PML, aquí se inicializan todas las cosas que se utilizarán.
+		/// También se define si la capa es de entrada, oculta o de salida.
 		/// </summary>
 		/// <param name="layers">Capas obtenidas de las variables cuando se instancie un PML.</param>
 		public PML(int[] layers)
@@ -82,10 +83,11 @@ namespace Perceptron_Multicapa_Colores
 		/// <param name="max">Valor máximo con base al contexto de lo que se quiera entrenar.Normalización.</param>
 		public void Entrenar(double[][] entradas, double[][] salidas, double tasaAprendizaje, int epocas, int min, int max)
 		{
-
 			for (int epoca = 0; epoca < epocas; epoca++)
 			{
 				double errorEpoca = 0;
+
+				double tasaAprendizajeActual = tasaAprendizaje / (1 + epoca * 0.01);
 
 				for (int e = 0; e < entradas.Length; e++)
 				{
@@ -104,12 +106,10 @@ namespace Perceptron_Multicapa_Colores
 						errores[s] = salidas[e][s] - salidaRed[s];
 					}
 
-					Retropropagacion(errores, tasaAprendizaje, entradaNormalizada);
+					Retropropagacion(errores, tasaAprendizajeActual, entradaNormalizada);
 				}
 
 				errorEpoca /= (entradas.Length * salidas[0].Length);
-
-				Console.WriteLine($"Epoca: {epoca}\tError: {errorEpoca}");
 
 				if (errorEpoca <= errorMinimo)
 				{
@@ -123,7 +123,8 @@ namespace Perceptron_Multicapa_Colores
 
 		public double[] Propagacion(double[] entradas, int min, int max)
 		{
-			double[] salidas = NormalizarDatos(entradas, min, max);
+			double[] salidas = new double[entradas.Length];
+
 			for (int c = 0; c < Capas.Length; c++)
 			{
 				salidas = Capas[c].Propagacion(salidas);
@@ -137,6 +138,11 @@ namespace Perceptron_Multicapa_Colores
 			{
 				Capas[c].Retropropagacion(errores, tasaAprendizaje, entradas);
 			}
+		}
+
+		public double NormalizarDatos(double entradas, int min, int max)
+		{
+			return (entradas - min) / (max - min);
 		}
 
 		public double[] NormalizarDatos(double[] entradas, int min, int max)
@@ -168,7 +174,7 @@ namespace Perceptron_Multicapa_Colores
 					}
 					else if (line.StartsWith("Peso"))
 					{
-						if (Capas[capaActual].Tipo != Capa.TipoCapa.Entrada) // Solo cargar pesos si no es capa de entrada
+						if (Capas[capaActual].Tipo != Capa.TipoCapa.Entrada) 
 						{
 							string[] partes = line.Split('=');
 							double peso = double.Parse(partes[1].Trim());
@@ -187,7 +193,7 @@ namespace Perceptron_Multicapa_Colores
 					}
 					else if (line.StartsWith("Sesgo"))
 					{
-						if (Capas[capaActual].Tipo != Capa.TipoCapa.Entrada) // Solo cargar sesgos si no es capa de entrada
+						if (Capas[capaActual].Tipo != Capa.TipoCapa.Entrada) 
 						{
 							string[] partes = line.Split('=');
 							double sesgo = double.Parse(partes[1].Trim());
@@ -217,7 +223,7 @@ namespace Perceptron_Multicapa_Colores
 			{
 				for (int i = 0; i < Capas.Length; i++)
 				{
-					if (Capas[i].Tipo != Capa.TipoCapa.Entrada) // Solo guardar si no es capa de entrada
+					if (Capas[i].Tipo != Capa.TipoCapa.Entrada)
 					{
 						archivo.EscribirArchivo($"Capa {i}:", archivoPesos + formatoArchivos);
 						for (int j = 0; j < Capas[i].Neuronas.Length; j++)

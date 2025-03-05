@@ -76,9 +76,9 @@ namespace Perceptron_Multicapa_Colores
 			{
 				for (int i = 0; i < Pesos.Length; i++)
 				{
-					Pesos[i] = tasaAprendizaje * Delta * entradas[i];
+					Pesos[i] += tasaAprendizaje * Delta * entradas[i];
 				}
-				Bias = tasaAprendizaje * Delta;
+				Bias += tasaAprendizaje * Delta;
 			}
 		}
 	}
