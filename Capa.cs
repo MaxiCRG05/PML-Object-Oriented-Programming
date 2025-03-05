@@ -4,6 +4,8 @@ namespace Perceptron_Multicapa_Colores
 {
 	/// <summary>
 	/// Clase Capa para manejar las capas del PML.
+	/// Aquí se hace la retropropagación, la propagación y el cálculo de la función de activación y su derivada.
+	/// También se manejan las neuronas.
 	/// </summary>
 	public class Capa
 	{
@@ -39,7 +41,7 @@ namespace Perceptron_Multicapa_Colores
 				// Capa de entrada: no tiene pesos ni sesgos
 				for (int i = 0; i < numeroNeuronas; i++)
 				{
-					Neuronas[i] = new Neurona($"Neurona_{i}", 0); // Sin pesos
+					Neuronas[i] = new Neurona($"Neurona_{i}", 0);
 				}
 			}
 			else
@@ -96,7 +98,7 @@ namespace Perceptron_Multicapa_Colores
 			{
 				Neurona neurona = Neuronas[i];
 				neurona.Delta = errores[i] * FuncionDeActivacionDerivada(neurona.Salida);
-				neurona.ActualizarPesos(tasaAprendizaje, entradas); // Asegúrate de que 'entradas' tenga el tamaño correcto
+				neurona.ActualizarPesos(tasaAprendizaje, entradas);
 			}
 		}
 
@@ -114,7 +116,10 @@ namespace Perceptron_Multicapa_Colores
 			//return Math.Max(0,x);
 
 			// Leaky ReLU
-			return x > 0 ? x : 0.01 * x;
+			//return x > 0 ? x : 0.01 * x;
+
+			//ELU
+			return x > 0 ? x : 0.01 * (Math.Exp(x) - 1);
 		}
 
 		/// <summary>
@@ -131,7 +136,10 @@ namespace Perceptron_Multicapa_Colores
 			//return x > 0 ? 1 : 0;
 
 			//Leaky ReLU
-			return x > 0 ? 1 : 0.01;
+			//return x > 0 ? 1 : 0.01;
+
+			//ELU
+			return x > 0 ? 1 : 0.01 * Math.Exp(x);
 		}
 	}
 }

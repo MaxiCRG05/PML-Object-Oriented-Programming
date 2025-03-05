@@ -4,16 +4,41 @@ using System.Windows.Forms;
 namespace Perceptron_Multicapa_Colores
 {
 	/// <summary>
-	/// Clase del Perceptrón MultiCapa
+	/// Clase del Perceptrón MultiCapa, se encarga del entrenamiento y la propagación.
 	/// </summary>
 	class PML
 	{
+		/// <summary>
+		/// archivoPesos: Variable para poder obtener el nombre del archivo de configuración.
+		/// formatoArchivos: Variable para poder obtener el formato de los archivos.
+		/// </summary>
 		private readonly string archivoPesos, formatoArchivos;
+
+		/// <summary>
+		/// errorMinimo: Variable para obtener el error mínimo.
+		/// </summary>
 		private readonly double errorMinimo;
+
+		/// <summary>
+		/// Capas: Arreglo de capas.
+		/// </summary>
 		private readonly Capa[] Capas;
+
+		/// <summary>
+		/// Instancia de la clase VariablesGlobales para definir los parámetros que se utilizarán para entrenar la red.
+		/// Entre otras cosas.
+		/// </summary>
 		private readonly VariablesGlobales variables = new VariablesGlobales();
+
+		/// <summary>
+		/// Instancia de la clase Archivos para manejar los archivos de guardado de la red neuronal.
+		/// </summary>
 		public readonly Archivos archivo;
 
+		/// <summary>
+		/// Método constructor de la clase PML, aquí se inicializan todas las cosas que se utilizarán.
+		/// </summary>
+		/// <param name="layers">Capas obtenidas de las variables cuando se instancie un PML.</param>
 		public PML(int[] layers)
 		{
 			formatoArchivos = variables.GetFormato();
@@ -25,7 +50,7 @@ namespace Perceptron_Multicapa_Colores
 
 			for (int i = 0; i < layers.Length; i++)
 			{
-				int neuronasCapaAnterior = (i == 0) ? 0 : layers[i - 1]; 
+				int neuronasCapaSiguiente = (i == 0) ? 0 : layers[i - 1]; 
 				Capa.TipoCapa tipo;
 
 				if (i == 0)
@@ -41,54 +66,64 @@ namespace Perceptron_Multicapa_Colores
 					tipo = Capa.TipoCapa.Oculta;
 				}
 
-				Capas[i] = new Capa(layers[i], neuronasCapaAnterior, tipo); 
+				Capas[i] = new Capa(layers[i], neuronasCapaSiguiente, tipo); 
 			}
 		}
 
+
+		/// <summary>
+		/// Método para entrenar la red neuronal.
+		/// </summary>
+		/// <param name="entradas">Entradas que se procesarán para el entrenamiento de la red neuronal.</param>
+		/// <param name="salidas">Salidas esperadas para el entrenamiento de la red neuronal.</param>
+		/// <param name="tasaAprendizaje">Tasa de aprendizaje de la red neuronal.</param>
+		/// <param name="epocas">Epocas que realizará el entrenamiento.</param>
+		/// <param name="min">Valor mínimo con base al contexto de lo que se quiera entrenar.Normalización.</param>
+		/// <param name="max">Valor máximo con base al contexto de lo que se quiera entrenar.Normalización.</param>
 		public void Entrenar(double[][] entradas, double[][] salidas, double tasaAprendizaje, int epocas, int min, int max)
 		{
+
 			for (int epoca = 0; epoca < epocas; epoca++)
 			{
 				double errorEpoca = 0;
 
 				for (int e = 0; e < entradas.Length; e++)
 				{
-					double[] entradaNormalizada = NormalizarEntradas(entradas[e], min, max);
+					double[] entradaNormalizada = NormalizarDatos(entradas[e], min, max);
 					double[] salidaRed = Propagacion(entradaNormalizada, min, max);
 
-					for (int i = 0; i < salidas[e].Length; i++)
+					for (int s = 0; s < salidas[e].Length; s++)
 					{
-						errorEpoca += Math.Pow(salidas[e][i] - salidaRed[i], 2);
+						errorEpoca += Math.Pow(salidas[e][s] - salidaRed[s], 2);
 					}
 
 					double[] errores = new double[salidas[e].Length];
-					for (int i = 0; i < salidas[e].Length; i++)
+
+					for (int s = 0; s < salidas[e].Length; s++)
 					{
-						errores[i] = salidas[e][i] - salidaRed[i];
+						errores[s] = salidas[e][s] - salidaRed[s];
 					}
+
 					Retropropagacion(errores, tasaAprendizaje, entradaNormalizada);
 				}
 
 				errorEpoca /= (entradas.Length * salidas[0].Length);
 
-				Console.WriteLine($"Época {epoca + 1}, Error: {errorEpoca}");
+				Console.WriteLine($"Epoca: {epoca}\tError: {errorEpoca}");
 
-				if (double.IsNaN(errorEpoca))
+				if (errorEpoca <= errorMinimo)
 				{
-					Console.WriteLine($"Error en el entrenamiento");
-					break;
-				}
-				else if (errorEpoca <= errorMinimo)
-				{
-					Console.WriteLine($"Entrenamiento detenido en la época {epoca + 1}. Error mínimo alcanzado: {errorEpoca}");
+					MessageBox.Show($"Entrenamiento detenido en la época {epoca + 1}. El error se disminuyó: {errorEpoca}", "PML");
 					break;
 				}
 			}
+
+			MessageBox.Show("Entrenamiento finalizado.", "PML");
 		}
 
 		public double[] Propagacion(double[] entradas, int min, int max)
 		{
-			double[] salidas = NormalizarEntradas(entradas, min, max);
+			double[] salidas = NormalizarDatos(entradas, min, max);
 			for (int c = 0; c < Capas.Length; c++)
 			{
 				salidas = Capas[c].Propagacion(salidas);
@@ -104,12 +139,7 @@ namespace Perceptron_Multicapa_Colores
 			}
 		}
 
-		public double NormalizarSalidas(double x, int min, int max)
-		{
-			return (x - min) / (max - min);
-		}
-
-		public double[] NormalizarEntradas(double[] entradas, int min, int max)
+		public double[] NormalizarDatos(double[] entradas, int min, int max)
 		{
 			double[] resultado = new double[entradas.Length];
 			for (int i = 0; i < entradas.Length; i++)
