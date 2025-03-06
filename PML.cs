@@ -28,16 +28,16 @@ namespace Perceptron_Multicapa_Colores
 
 			// Inicializar las capas
 			Capas = new Capa[layers.Length];
-			for (int i = 0; i < layers.Length; i++)
+			for (int c = 0; c < layers.Length; c++)
 			{
-				int neuronasCapaSiguiente = (i == 0) ? 0 : layers[i - 1];
+				int neuronasCapaSiguiente = (c == 0) ? 0 : layers[c - 1];
 				Capa.TipoCapa tipo;
 
-				if (i == 0)
+				if (c == 0)
 				{
 					tipo = Capa.TipoCapa.Entrada;
 				}
-				else if (i == layers.Length - 1)
+				else if (c == layers.Length - 1)
 				{
 					tipo = Capa.TipoCapa.Salida;
 				}
@@ -46,7 +46,7 @@ namespace Perceptron_Multicapa_Colores
 					tipo = Capa.TipoCapa.Oculta;
 				}
 
-				Capas[i] = new Capa(layers[i], neuronasCapaSiguiente, tipo);
+				Capas[c] = new Capa(layers[c], neuronasCapaSiguiente, tipo);
 			}
 		}
 

@@ -75,9 +75,9 @@ namespace Perceptron_Multicapa_Colores
 				for (int i = 0; i < Neuronas.Length; i++)
 				{
 					double suma = 0;
-					for (int j = 0; j < entradas.Length; j++)
+					for (int e = 0; e < entradas.Length; e++)
 					{
-						suma += entradas[j] * Neuronas[i].Pesos[j];
+						suma += entradas[e] * Neuronas[i].Pesos[e];
 					}
 					Neuronas[i].Salida = FuncionActivacion(suma + Neuronas[i].Bias);
 					salidas[i] = Neuronas[i].Salida;

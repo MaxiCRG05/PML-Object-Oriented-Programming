@@ -25,9 +25,9 @@ namespace Perceptron_Multicapa_Colores
 			{
 				Pesos = new double[numeroPesos];
 				Random rand = new Random();
-				for (int i = 0; i < numeroPesos; i++)
+				for (int w = 0; w < numeroPesos; w++)
 				{
-					Pesos[i] = (rand.NextDouble() - 0.5) * 0.02; 
+					Pesos[w] = (rand.NextDouble() - 0.5) * 0.02; 
 				}
 				Bias = (rand.NextDouble() - 0.5) * 0.02; 
 			}
@@ -44,16 +44,16 @@ namespace Perceptron_Multicapa_Colores
 		/// Método para actualizar los pesos de la neurona durante la retropropagación.
 		/// </summary>
 		/// <param name="tasaAprendizaje">Tasa de aprendizaje.</param>
-		/// <param name="entradas">Entradas de la capa anterior.</param>
+		/// <param name="entradas">Entradas de la	capa anterior.</param>
 		public void ActualizarPesos(double tasaAprendizaje)
 		{
 			if (Pesos != null)
 			{
-				for (int i = 0; i < Pesos.Length; i++)
+				for (int w = 0; w < Pesos.Length; w++)
 				{
-					Pesos[i] += tasaAprendizaje * Delta * Salida;
+					Pesos[w] += tasaAprendizaje * Delta * Salida;
 				}
-				Bias = tasaAprendizaje * Delta;
+				Bias += tasaAprendizaje * Delta;
 			}
 		}
 	}
