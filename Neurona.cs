@@ -7,54 +7,29 @@ namespace Perceptron_Multicapa_Colores
 	/// </summary>
 	public class Neurona
 	{
-		/// <summary>
-		/// Variable para obtener un número aleatorio.
-		/// </summary>
-		private static Random rand = new Random();
-
-		/// <summary>
-		/// Nombre de la neurona.
-		/// </summary>
 		public string Nombre { get; set; }
-
-		/// <summary>
-		/// Pesos de la neurona, cada peso dependiendo de la capa siguiente
-		/// </summary>
-		public double[] Pesos { get; set; } 
-
-		/// <summary>
-		/// Bias de cada neurona.
-		/// </summary>
-		public double Bias { get; set; }
-		
-		/// <summary>
-		/// Delta o error de cada neurona.
-		/// </summary>
-		public double Delta { get; set; } 
-
-		/// <summary>
-		/// Salida predicha de cada neurona.
-		/// </summary>
-		public double Salida { get; set; } 
+		public double[] Pesos { get; set; } // Pesos de la neurona
+		public double Bias { get; set; }    // Sesgo de la neurona
+		public double Delta { get; set; }   // Delta (error) de la neurona
+		public double Salida { get; set; }  // Salida de la neurona
 
 		/// <summary>
 		/// Constructor de la clase Neurona.
 		/// </summary>
 		/// <param name="nombre">Nombre de la neurona.</param>
-		/// <param name="numeroPesos">Número de pesos (conexiones con la capa siguiente).</param>
+		/// <param name="numeroPesos">Número de pesos (conexiones con la capa anterior).</param>
 		public Neurona(string nombre, int numeroPesos)
 		{
-			
 			Nombre = nombre;
 			if (numeroPesos > 0)
 			{
 				Pesos = new double[numeroPesos];
-
+				Random rand = new Random();
 				for (int i = 0; i < numeroPesos; i++)
 				{
-					Pesos[i] = (double)(rand.NextDouble() - 0.5) * Math.Sqrt(2.0 / numeroPesos);
+					Pesos[i] = (rand.NextDouble() - 0.5) * 0.02; 
 				}
-				Bias = (double)rand.NextDouble() - 0.5f;
+				Bias = (rand.NextDouble() - 0.5) * 0.02; 
 			}
 			else
 			{
@@ -70,15 +45,15 @@ namespace Perceptron_Multicapa_Colores
 		/// </summary>
 		/// <param name="tasaAprendizaje">Tasa de aprendizaje.</param>
 		/// <param name="entradas">Entradas de la capa anterior.</param>
-		public void ActualizarPesos(double tasaAprendizaje, double[] entradas)
+		public void ActualizarPesos(double tasaAprendizaje)
 		{
-			if (Pesos != null && entradas.Length == Pesos.Length)
+			if (Pesos != null)
 			{
 				for (int i = 0; i < Pesos.Length; i++)
 				{
-					Pesos[i] += tasaAprendizaje * Delta * entradas[i];
+					Pesos[i] += tasaAprendizaje * Delta * Salida;
 				}
-				Bias += tasaAprendizaje * Delta;
+				Bias = tasaAprendizaje * Delta;
 			}
 		}
 	}

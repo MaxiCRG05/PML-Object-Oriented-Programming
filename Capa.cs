@@ -92,15 +92,15 @@ namespace Perceptron_Multicapa_Colores
 		/// <param name="errores">Errores de la capa siguiente.</param>
 		/// <param name="tasaAprendizaje">Tasa de aprendizaje.</param>
 		/// <param name="entradas">Entradas de la capa.</param>
-		public void Retropropagacion(double[] errores, double tasaAprendizaje, double[] entradas)
-		{
-			for (int i = 0; i < Neuronas.Length; i++)
-			{
-				Neurona neurona = Neuronas[i];
-				neurona.Delta = errores[i] * FuncionDeActivacionDerivada(neurona.Salida);
-				neurona.ActualizarPesos(tasaAprendizaje, entradas);
-			}
-		}
+		public void Retropropagacion(double[] errores, double tasaAprendizaje)
+        {
+            for (int i = 0; i < Neuronas.Length; i++)
+            {
+                Neurona neurona = Neuronas[i];
+                neurona.Delta = errores[i] * FuncionDeActivacionDerivada(neurona.Salida);
+                neurona.ActualizarPesos(tasaAprendizaje);
+            }
+        }
 
 		/// <summary>
 		/// Método para la función de activación: FUNCION RELU, LEAKY RELU Y SIGMOIDE
@@ -116,10 +116,10 @@ namespace Perceptron_Multicapa_Colores
 			//return Math.Max(0,x);
 
 			// Leaky ReLU
-			//return x > 0 ? x : 0.01 * x;
+			return x > 0 ? x : 0.01 * x;
 
 			//ELU
-			return x > 0 ? x : 0.01 * (Math.Exp(x) - 1);
+			//return x > 0 ? x : 0.01 * (Math.Exp(x) - 1);
 		}
 
 		/// <summary>
@@ -136,10 +136,10 @@ namespace Perceptron_Multicapa_Colores
 			//return x > 0 ? 1 : 0;
 
 			//Leaky ReLU
-			//return x > 0 ? 1 : 0.01;
+			return x > 0 ? 1 : 0.01;
 
 			//ELU
-			return x > 0 ? 1 : 0.01 * Math.Exp(x);
+			//return x > 0 ? 1 : 0.01 * Math.Exp(x);
 		}
 	}
 }
