@@ -89,7 +89,7 @@ namespace Perceptron_Multicapa_Colores
 		/// </summary>
 		/// <param name="errores">Errores de la capa siguiente.</param>
 		/// <param name="tasaAprendizaje">Tasa de aprendizaje.</param>
-		public void Retropropagacion(double[] errores, double tasaAprendizaje)
+		public void Retropropagacion(double[] errores)
 		{
 			for (int i = 0; i < Neuronas.Length; i++)
 			{
@@ -100,9 +100,9 @@ namespace Perceptron_Multicapa_Colores
 				{
 					for (int w = 0; w < neurona.Pesos.Length; w++)
 					{
-						neurona.Pesos[w] = neurona.Pesos[w] - (tasaAprendizaje * neurona.Delta * Neuronas[i].Salida);
+						neurona.Pesos[w] = neurona.Pesos[w] - (VariablesGlobales.TasaAprendizaje * neurona.Delta * Neuronas[i].Salida);
 					}
-					neurona.Bias = tasaAprendizaje * neurona.Delta;
+					neurona.Bias = VariablesGlobales.TasaAprendizaje * neurona.Delta;
 				}
 			}
 		}

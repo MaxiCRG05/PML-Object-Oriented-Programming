@@ -26,7 +26,6 @@ namespace Perceptron_Multicapa_Colores
 			errorMinimo = variables.GetErrorMinimo();
 			archivo = new Archivos(variables.GetRuta());
 
-			// Inicializar las capas
 			Capas = new Capa[layers.Length];
 			for (int c = 0; c < layers.Length; c++)
 			{
@@ -61,10 +60,6 @@ namespace Perceptron_Multicapa_Colores
 		/// <param name="max">Valor máximo para normalización.</param>
 		public void Entrenar(double[][] entradas, double[][] salidas, double tasaAprendizaje, int epocas, int min, int max)
 		{
-			double mejorError = double.MaxValue;
-			int epocasSinMejora = 0;
-			const int paciencia = 1000;
-
 			for (int epoca = 0; epoca < epocas; epoca++)
 			{
 				double errorEpoca = 0;
@@ -82,21 +77,6 @@ namespace Perceptron_Multicapa_Colores
 				}
 
 				errorEpoca /= (entradas.Length * salidas[0].Length);
-
-				if (errorEpoca < mejorError)
-				{
-					mejorError = errorEpoca;
-					epocasSinMejora = 0;
-				}
-				else
-				{
-					epocasSinMejora++;
-					if (epocasSinMejora >= paciencia)
-					{
-						Console.WriteLine($"Entrenamiento detenido en la época {epoca + 1}. Error: {errorEpoca}");
-						break;
-					}
-				}
 
 				Console.WriteLine($"Época: {epoca + 1}, Error: {errorEpoca}");
 
