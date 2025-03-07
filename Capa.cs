@@ -91,16 +91,23 @@ namespace Perceptron_Multicapa_Colores
 		/// </summary>
 		/// <param name="errores">Errores de la capa siguiente.</param>
 		/// <param name="tasaAprendizaje">Tasa de aprendizaje.</param>
-		/// <param name="entradas">Entradas de la capa.</param>
 		public void Retropropagacion(double[] errores, double tasaAprendizaje)
-        {
-            for (int i = 0; i < Neuronas.Length; i++)
-            {
-                Neurona neurona = Neuronas[i];
-                neurona.Delta = errores[i] * FuncionDeActivacionDerivada(neurona.Salida);
-                neurona.ActualizarPesos(tasaAprendizaje);
-            }
-        }
+		{
+			for (int i = 0; i < Neuronas.Length; i++)
+			{
+				Neurona neurona = Neuronas[i];
+				neurona.Delta = errores[i] * FuncionDeActivacionDerivada(neurona.Salida);
+
+				if (Tipo != TipoCapa.Entrada)
+				{
+					for (int w = 0; w < neurona.Pesos.Length; w++)
+					{
+						neurona.Pesos[w] += tasaAprendizaje * neurona.Delta * Neuronas[i].Salida;
+					}
+					neurona.Bias += tasaAprendizaje * neurona.Delta;
+				}
+			}
+		}
 
 		/// <summary>
 		/// Método para la función de activación: FUNCION RELU, LEAKY RELU Y SIGMOIDE
