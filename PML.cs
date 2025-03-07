@@ -71,13 +71,10 @@ namespace Perceptron_Multicapa_Colores
 
 				for (int e = 0; e < entradas.Length; e++)
 				{
-					// Propagación hacia adelante
 					double[] salidaRed = Propagacion(entradas[e], min, max);
 
-					// Retropropagación
 					Retropropagacion(salidas[e], tasaAprendizaje);
 
-					// Cálculo del error
 					for (int s = 0; s < salidas[e].Length; s++)
 					{
 						errorEpoca += Math.Pow(salidas[e][s] - salidaRed[s], 2);
@@ -86,7 +83,6 @@ namespace Perceptron_Multicapa_Colores
 
 				errorEpoca /= (entradas.Length * salidas[0].Length);
 
-				// Verificar si el error ha mejorado
 				if (errorEpoca < mejorError)
 				{
 					mejorError = errorEpoca;
@@ -104,7 +100,6 @@ namespace Perceptron_Multicapa_Colores
 
 				Console.WriteLine($"Época: {epoca + 1}, Error: {errorEpoca}");
 
-				// Detener el entrenamiento si el error es menor o igual al error mínimo
 				if (errorEpoca <= errorMinimo)
 				{
 					MessageBox.Show($"Entrenamiento detenido en la época {epoca + 1}. Error: {errorEpoca}", "PML");
@@ -141,7 +136,7 @@ namespace Perceptron_Multicapa_Colores
 		/// <param name="tasaAprendizaje">Tasa de aprendizaje.</param>
 		private void Retropropagacion(double[] salidaEsperada, double tasaAprendizaje)
 		{
-			for (int c = Capas.Length - 1; c >= 0; c--)
+			for (int c = Capas.Length - 2; c > 0; c--)
 			{
 				Capas[c].Retropropagacion(salidaEsperada, tasaAprendizaje);
 			}

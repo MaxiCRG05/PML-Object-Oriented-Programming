@@ -38,7 +38,6 @@ namespace Perceptron_Multicapa_Colores
 
 			if (tipo == TipoCapa.Entrada)
 			{
-				// Capa de entrada: no tiene pesos ni sesgos
 				for (int i = 0; i < numeroNeuronas; i++)
 				{
 					Neuronas[i] = new Neurona($"Neurona_{i}", 0);
@@ -46,7 +45,6 @@ namespace Perceptron_Multicapa_Colores
 			}
 			else
 			{
-				// Capa oculta o de salida: tiene pesos y sesgos
 				for (int i = 0; i < numeroNeuronas; i++)
 				{
 					Neuronas[i] = new Neurona($"Neurona_{i}", numeroNeuronasCapaSiguiente);
@@ -102,9 +100,9 @@ namespace Perceptron_Multicapa_Colores
 				{
 					for (int w = 0; w < neurona.Pesos.Length; w++)
 					{
-						neurona.Pesos[w] += tasaAprendizaje * neurona.Delta * Neuronas[i].Salida;
+						neurona.Pesos[w] = neurona.Pesos[w] - (tasaAprendizaje * neurona.Delta * Neuronas[i].Salida);
 					}
-					neurona.Bias += tasaAprendizaje * neurona.Delta;
+					neurona.Bias = tasaAprendizaje * neurona.Delta;
 				}
 			}
 		}

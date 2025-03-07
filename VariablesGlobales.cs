@@ -43,7 +43,7 @@ namespace Perceptron_Multicapa_Colores
 		/// {Número de datos que va
 		/// n a entrar, Número de neuronas en cada capa oculta (pueden ser n número de capas ocultas), Número de datos que van a salir }
 		/// </summary>
-		private static readonly int[] DatosPerceptron = { 3, 10, 10, 10, 10, 10, 10, 12 };
+		private static readonly int[] DatosPerceptron = { 3, 10, 12 };
 
 		/// <summary>
 		/// NombresColores: Datos que se utilizarán para que el perceptrón multicapa analice
