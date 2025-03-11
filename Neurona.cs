@@ -36,16 +36,23 @@ namespace Perceptron_Multicapa_Colores
 		/// <summary>
 		/// Lista de neuronas de la capa siguiente.
 		/// </summary>
-		public List<Neurona> NeuronasSiguiente;
+		public List<Neurona> NeuronasSiguientes;
+
+		/// <summary>
+		/// Lista de neuronas de la capa anterior.
+		/// </summary>
+		public List<Neurona> NeuronasAnteriores;
 
 		/// <summary>
 		/// Constructor de la clase Neurona.
 		/// </summary>
 		/// <param name="nombre">Nombre de la neurona.</param>
 		/// <param name="numeroPesos">Número de pesos (conexiones con la capa anterior).</param>
-		public Neurona(string nombre, int numeroNeuronasSiguientes)
+		public Neurona(string name, int numeroNeuronasSiguientes)
 		{
-			Nombre = nombre;
+			NeuronasSiguientes = new List<Neurona>();
+			NeuronasAnteriores = new List<Neurona>();
+			Nombre = name;
 
 			if (numeroNeuronasSiguientes > 0)
 			{
@@ -56,7 +63,6 @@ namespace Perceptron_Multicapa_Colores
 					Pesos[w] = rand.NextDouble(); 
 				}
 				Bias = rand.NextDouble();
-				AgregarNeurona(numeroNeuronasSiguientes);
 			}
 			else
 			{
@@ -67,12 +73,19 @@ namespace Perceptron_Multicapa_Colores
 			Salida = 0;
 		}
 
-		private void AgregarNeurona(int numeroNeuronasSiguientes)
+		/// <summary>
+		/// Método para agregar una neurona e interconectarla con las otras neuronas.
+		/// </summary>
+		/// <param name="tipo"></param>
+		public void agregarNeurona(bool tipo)
 		{
-			NeuronasSiguiente = new List<Neurona>();
-			for (int i = 0; i < numeroNeuronasSiguientes; i++)
+			if (tipo)
 			{
-				NeuronasSiguiente.Add(new Neurona("Neurona " + i, 0));
+				NeuronasSiguientes.Add(new Neurona($"Neurona_{NeuronasSiguientes.Count}", NeuronasSiguientes.Count));
+			}
+			else
+			{
+				NeuronasAnteriores.Add(new Neurona($"Neurona_{NeuronasAnteriores.Count}", NeuronasAnteriores.Count));
 			}
 		}
 	}

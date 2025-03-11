@@ -9,10 +9,7 @@ namespace Perceptron_Multicapa_Colores
 	/// </summary>
 	class PML
 	{
-		private readonly string archivoPesos, formatoArchivos;
-		private readonly double errorMinimo;
 		private readonly Capa[] Capas;
-		private readonly VariablesGlobales variables = new VariablesGlobales();
 		public readonly Archivos archivo;
 
 		/// <summary>
@@ -21,30 +18,11 @@ namespace Perceptron_Multicapa_Colores
 		/// <param name="layers">Arreglo que define el número de neuronas en cada capa.</param>
 		public PML(int[] layers)
 		{
-			formatoArchivos = variables.GetFormato();
-			archivoPesos = variables.GetArchivoConfiguracion();
-			errorMinimo = variables.GetErrorMinimo();
-			archivo = new Archivos(variables.GetRuta());
-
 			Capas = new Capa[layers.Length];
 			for (int c = 0; c < layers.Length; c++)
 			{
-				int neuronasCapaSiguiente = (c == 0) ? 0 : layers[c - 1];
-				Capa.TipoCapa tipo;
-
-				if (c == 0)
-				{
-					tipo = Capa.TipoCapa.Entrada;
-				}
-				else if (c == layers.Length - 1)
-				{
-					tipo = Capa.TipoCapa.Salida;
-				}
-				else
-				{
-					tipo = Capa.TipoCapa.Oculta;
-				}
-
+				int neuronasCapaSiguiente = (c == layers.Length - 1) ? 0 : layers[c + 1];
+				Capa.TipoCapa tipo = (c == 0) ? Capa.TipoCapa.Entrada : (c == layers.Length - 1) ? Capa.TipoCapa.Salida : Capa.TipoCapa.Oculta;
 				Capas[c] = new Capa(layers[c], neuronasCapaSiguiente, tipo);
 			}
 		}
@@ -58,7 +36,7 @@ namespace Perceptron_Multicapa_Colores
 		/// <param name="epocas">Número de épocas de entrenamiento.</param>
 		/// <param name="min">Valor mínimo para normalización.</param>
 		/// <param name="max">Valor máximo para normalización.</param>
-		public void Entrenar(double[][] entradas, double[][] salidas, double tasaAprendizaje, int epocas, int min, int max)
+		public void Entrenar(double[][] entradas, double[][] salidas, int epocas)
 		{
 			for (int epoca = 0; epoca < epocas; epoca++)
 			{
@@ -66,9 +44,9 @@ namespace Perceptron_Multicapa_Colores
 
 				for (int e = 0; e < entradas.Length; e++)
 				{
-					double[] salidaRed = Propagacion(entradas[e], min, max);
+					double[] salidaRed = Propagacion(entradas[e]);
 
-					Retropropagacion(salidas[e], tasaAprendizaje);
+					Retropropagacion(salidas[e]);
 
 					for (int s = 0; s < salidas[e].Length; s++)
 					{
@@ -79,27 +57,17 @@ namespace Perceptron_Multicapa_Colores
 				errorEpoca /= (entradas.Length * salidas[0].Length);
 
 				Console.WriteLine($"Época: {epoca + 1}, Error: {errorEpoca}");
-
-				if (errorEpoca <= errorMinimo)
-				{
-					MessageBox.Show($"Entrenamiento detenido en la época {epoca + 1}. Error: {errorEpoca}", "PML");
-					break;
-				}
 			}
-
-			MessageBox.Show("Entrenamiento finalizado.", "PML");
 		}
 
 		/// <summary>
 		/// Realiza la propagación hacia adelante
 		/// </summary>
 		/// <param name="entradas">Entradas de la red.</param>
-		/// <param name="min">Valor mínimo para normalización.</param>
-		/// <param name="max">Valor máximo para normalización.</param>
 		/// <returns>Salida de la red.</returns>
-		public double[] Propagacion(double[] entradas, int min, int max)
+		public double[] Propagacion(double[] entradas)
 		{
-			double[] salidas = NormalizarDatos(entradas, min, max);
+			double[] salidas = NormalizarDatos(entradas);
 
 			for (int c = 0; c < Capas.Length; c++)
 			{
@@ -114,9 +82,9 @@ namespace Perceptron_Multicapa_Colores
 		/// </summary>
 		/// <param name="salidaEsperada">Salida esperada.</param>
 		/// <param name="tasaAprendizaje">Tasa de aprendizaje.</param>
-		private void Retropropagacion(double[] salidaEsperada, double tasaAprendizaje)
+		private void Retropropagacion(double[] salidaEsperada)
 		{
-			for (int c = Capas.Length - 2; c > 0; c--)
+			for (int c = Capas.Length - 1; c >= 0; c--)
 			{
 				Capas[c].Retropropagacion(salidaEsperada);
 			}
@@ -126,27 +94,23 @@ namespace Perceptron_Multicapa_Colores
 		/// Normaliza un valor individual
 		/// </summary>
 		/// <param name="entrada">Valor a normalizar.</param>
-		/// <param name="min">Valor mínimo.</param>
-		/// <param name="max">Valor máximo.</param>
 		/// <returns>Valor normalizado.</returns>
-		public double NormalizarDatos(double entrada, int min, int max)
+		public double NormalizarDatos(double entrada)
 		{
-			return (entrada - min) / (max - min);
+			return (entrada - VariablesGlobales.Min) / (VariablesGlobales.Max - VariablesGlobales.Min);
 		}
 
 		/// <summary>
 		/// Normaliza un arreglo de valores
 		/// </summary>
 		/// <param name="entradas">Arreglo de valores a normalizar.</param>
-		/// <param name="min">Valor mínimo.</param>
-		/// <param name="max">Valor máximo.</param>
 		/// <returns>Arreglo de valores normalizados.</returns>
-		public double[] NormalizarDatos(double[] entradas, int min, int max)
+		public double[] NormalizarDatos(double[] entradas)
 		{
 			double[] resultado = new double[entradas.Length];
 			for (int i = 0; i < entradas.Length; i++)
 			{
-				resultado[i] = NormalizarDatos(entradas[i], min, max);
+				resultado[i] = NormalizarDatos(entradas[i]);
 			}
 			return resultado;
 		}
@@ -164,7 +128,7 @@ namespace Perceptron_Multicapa_Colores
 				int neuronaActual = 0;
 				int pesoActual = 0;
 
-				while ((line = archivo.LeerArchivo(archivoPesos + formatoArchivos)) != null)
+				while ((line = archivo.LeerArchivo(VariablesGlobales.Configuracion + VariablesGlobales.FormatoArchivos)) != null)
 				{
 					if (line.StartsWith("Capa"))
 					{
@@ -228,14 +192,14 @@ namespace Perceptron_Multicapa_Colores
 				{
 					if (Capas[i].Tipo != Capa.TipoCapa.Entrada)
 					{
-						archivo.EscribirArchivo($"Capa {i}:", archivoPesos + formatoArchivos);
+						archivo.EscribirArchivo($"Capa {i}:", VariablesGlobales.Configuracion + VariablesGlobales.FormatoArchivos);
 						for (int j = 0; j < Capas[i].Neuronas.Length; j++)
 						{
 							for (int k = 0; k < Capas[i].Neuronas[j].Pesos.Length; k++)
 							{
-								archivo.EscribirArchivo($"Peso[{i}][{j}][{k}] = {Capas[i].Neuronas[j].Pesos[k]}", archivoPesos + formatoArchivos);
+								archivo.EscribirArchivo($"Peso[{i}][{j}][{k}] = {Capas[i].Neuronas[j].Pesos[k]}", VariablesGlobales.Configuracion + VariablesGlobales.FormatoArchivos);
 							}
-							archivo.EscribirArchivo($"Sesgo[{i}][{j}] = {Capas[i].Neuronas[j].Bias}", archivoPesos + formatoArchivos);
+							archivo.EscribirArchivo($"Sesgo[{i}][{j}] = {Capas[i].Neuronas[j].Bias}", VariablesGlobales.Configuracion + VariablesGlobales.FormatoArchivos);
 						}
 					}
 				}

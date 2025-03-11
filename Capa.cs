@@ -45,7 +45,7 @@ namespace Perceptron_Multicapa_Colores
 			}
 			else
 			{
-				for (int i = 0; i < numeroNeuronas; i++) 
+				for (int i = 0; i < numeroNeuronas; i++)
 				{
 					Neuronas[i] = new Neurona($"Neurona_{i}", numeroNeuronasCapaSiguiente);
 				}
@@ -69,7 +69,7 @@ namespace Perceptron_Multicapa_Colores
 			}
 			else
 			{
-				double[] salidas = new double[Neuronas.Length];
+				double[] Salidas = new double[Neuronas.Length];
 				for (int i = 0; i < Neuronas.Length; i++)
 				{
 					double suma = 0;
@@ -78,9 +78,9 @@ namespace Perceptron_Multicapa_Colores
 						suma += entradas[e] * Neuronas[i].Pesos[e];
 					}
 					Neuronas[i].Salida = FuncionActivacion(suma + Neuronas[i].Bias);
-					salidas[i] = Neuronas[i].Salida;
+					Salidas[i] = Neuronas[i].Salida;
 				}
-				return salidas;
+				return Salidas;
 			}
 		}
 
