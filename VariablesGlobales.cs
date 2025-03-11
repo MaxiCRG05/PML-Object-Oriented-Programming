@@ -22,8 +22,11 @@ namespace Perceptron_Multicapa_Colores
 		/// Datos: Nombre del archivo en el que se almacenarán los datos.
 		/// </summary>
 		public static readonly string Escritorio = Environment.GetFolderPath(Environment.SpecialFolder.Desktop), 
-			Carpeta = @"\Archivos\", Ruta = Path.Combine(Escritorio + Carpeta), FormatoArchivos = ".txt",
-			Configuracion = "configuracion", Datos = "colores";
+			Carpeta = @"\Archivos\", 
+			Ruta = Path.Combine(Escritorio + Carpeta), 
+			FormatoArchivos = ".txt",
+			Configuracion = "configuracion", 
+			Datos = "colores";
 
 		/// <summary>
 		/// Epocas: Iteraciones que se harán para el aprendizaje.
