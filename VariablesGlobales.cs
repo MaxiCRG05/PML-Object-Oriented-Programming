@@ -21,7 +21,7 @@ namespace Perceptron_Multicapa_Colores
 		/// Configuracion: Nombre del archivo para guardar la configuración.
 		/// Datos: Nombre del archivo en el que se almacenarán los datos.
 		/// </summary>
-		private static readonly string Escritorio = Environment.GetFolderPath(Environment.SpecialFolder.Desktop), 
+		public static readonly string Escritorio = Environment.GetFolderPath(Environment.SpecialFolder.Desktop), 
 			Carpeta = @"\Archivos\", Ruta = Path.Combine(Escritorio + Carpeta), FormatoArchivos = ".txt",
 			Configuracion = "configuracion", Datos = "colores";
 
@@ -30,7 +30,7 @@ namespace Perceptron_Multicapa_Colores
 		/// Min: Valor mínimo dentro del contexto de los datos.
 		/// Max: Valor máximo dentro del contexto de los datos.
 		/// </summary>
-		private static readonly int Epocas = 100000, Min = 0, Max = 255;
+		public static readonly int Epocas = 100000, Min = 0, Max = 255;
 
 		/// <summary>
 		/// TasaAprendizaje: Factor de aprendizaje.
@@ -43,17 +43,17 @@ namespace Perceptron_Multicapa_Colores
 		/// {Número de datos que va
 		/// n a entrar, Número de neuronas en cada capa oculta (pueden ser n número de capas ocultas), Número de datos que van a salir }
 		/// </summary>
-		private static readonly int[] DatosPerceptron = { 3, 10, 10, 12 };
+		public static readonly int[] DatosPerceptron = { 3, 10, 10, 12 };
 
 		/// <summary>
 		/// NombresColores: Datos que se utilizarán para que el perceptrón multicapa analice
 		/// </summary>
-		private static readonly string[] NombresColores = { "Rojo", "Verde", "Azul", "Amarillo", "Rosa", "Naranja", "Morado", "Cyan", "Gris", "Café", "Negro", "Blanco" };
+		public static readonly string[] NombresColores = { "Rojo", "Verde", "Azul", "Amarillo", "Rosa", "Naranja", "Morado", "Cyan", "Gris", "Café", "Negro", "Blanco" };
 
 		/// <summary>
 		/// Arreglo bidimensional el cual obtendrá los datos de entrada
 		/// </summary>
-		private static readonly double[][] Entradas =
+		public static readonly double[][] Entradas =
 		{
 			// Rojo
 			new double[] { 255, 0, 0 },       // Rojo puro
@@ -153,7 +153,7 @@ namespace Perceptron_Multicapa_Colores
 		/// <summary>
 		/// Salidas esperadas que sean y se aproximen a la salida obtenida del percetprón.
 		/// </summary>
-		private static readonly double[][] Salidas =
+		public static readonly double[][] Salidas =
 		{
 			// Rojo
 			new double[] { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, // Rojo puro
@@ -267,124 +267,6 @@ namespace Perceptron_Multicapa_Colores
 			{
 				Console.WriteLine($"Error al crear el directorio: {e.Message}");
 			}
-		}
-
-		/// <summary>
-		/// Método para regresar el nombre del archivo de configuración.
-		/// </summary>
-		/// <returns>Regresa el nombre del archivo.</returns>
-		public string GetArchivoConfiguracion()
-		{
-			return Configuracion;
-		}
-
-		/// <summary>
-		/// Método para regresar el nombre del archivo de datos.
-		/// </summary>
-		/// <returns>Regresa el nombre del archivo.</returns>
-		public string GetArchivoDatos()
-		{
-			return Datos;
-		}
-
-		/// <summary>
-		/// Método para regresar el error mínimo.
-		/// </summary>
-		/// <returns>Regresa el error mínimo.</returns>
-		public double GetErrorMinimo()
-		{
-			return ErrorMinimo;
-		}
-		
-		/// <summary>
-		/// Método para regresar el formato de los archivos.
-		/// </summary>
-		/// <returns>Regresa el formate de los archivos.</returns>
-		public string GetFormato()
-		{
-			return FormatoArchivos;
-		}
-
-		/// <summary>
-		/// Método para regresar la ruta en la cual guardar los archivos.
-		/// </summary>
-		/// <returns>Regresa la ruta.</returns>
-		public string GetRuta()
-		{
-			return Ruta;
-		}
-
-		/// <summary>
-		/// Método para regresar los datos a elección del PML.
-		/// </summary>
-		/// <returns>Regresa las opciones que tiene el perceptron.</returns>
-		public string[] GetColores()
-		{
-			return NombresColores;
-		}
-
-		/// <summary>
-		/// Método para regresar los datos del perceptron.
-		/// </summary>
-		/// <returns>Regresa los datos del perceptron.</returns>
-		public int[] GetDatosPerceptron()
-		{
-			return DatosPerceptron;
-		}
-
-		/// <summary>
-		/// Método para regresar la Tasa de aprendizaje.
-		/// </summary>
-		/// <returns>Regresa la Tasa de aprendizaje.</returns>
-		public double GetTasaAprendizaje()
-		{
-			return TasaAprendizaje;
-		}
-
-		/// <summary>
-		/// Método para regresar las épocas de entrenamiento.
-		/// </summary>
-		/// <returns>Regresa las épocas.</returns>
-		public int GetEpocas()
-		{
-			return Epocas;
-		}
-
-		/// <summary>
-		/// Método para regresar el valor mínimo.
-		/// </summary>
-		/// <returns>Regresa el mínimo.</returns>
-		public int GetMin()
-		{
-			return Min;
-		}
-
-		/// <summary>
-		/// Método para regresar el valor máximo.
-		/// </summary>
-		/// <returns>Regresa el máximo.</returns>
-		public int GetMax()
-		{
-			return Max;
-		}
-
-		/// <summary>
-		/// Método para regresar las entradas para el PML.
-		/// </summary>
-		/// <returns>Regresa las entradas.</returns>
-		public double[][] GetEntradas()
-		{
-			return Entradas;
-		}
-
-		
-		/// <summary>
-		/// Método para regresar las salidas esperadas del PML.
-		/// </summary>
-		/// <returns>Regresa las salidas.</returns>
-		public double[][] GetSalidas()
-		{
-			return Salidas;
 		}
 	}
 }

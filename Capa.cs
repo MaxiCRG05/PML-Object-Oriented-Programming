@@ -45,7 +45,7 @@ namespace Perceptron_Multicapa_Colores
 			}
 			else
 			{
-				for (int i = 0; i < numeroNeuronas; i++)
+				for (int i = 0; i < numeroNeuronas; i++) 
 				{
 					Neuronas[i] = new Neurona($"Neurona_{i}", numeroNeuronasCapaSiguiente);
 				}

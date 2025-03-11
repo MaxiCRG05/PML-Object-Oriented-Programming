@@ -118,7 +118,7 @@ namespace Perceptron_Multicapa_Colores
 		{
 			for (int c = Capas.Length - 2; c > 0; c--)
 			{
-				Capas[c].Retropropagacion(salidaEsperada, tasaAprendizaje);
+				Capas[c].Retropropagacion(salidaEsperada);
 			}
 		}
 
