@@ -44,14 +44,21 @@ namespace Perceptron_Multicapa_Colores
 			{
 				for (int i = 0; i < numeroNeuronas; i++)
 				{
-					Neuronas[i] = new Neurona($"Neurona_{i}", numeroNeuronas, numeroNeuronasCapaSiguiente, tipo);
+					Neuronas[i] = new Neurona($"Neurona_Entrada_{i}", numeroNeuronas, numeroNeuronasCapaSiguiente, tipo);
 				}
 			}
-			else
+			else if (tipo == TipoCapa.Oculta)
 			{
 				for (int i = 0; i < numeroNeuronas; i++)
 				{
-					Neuronas[i] = new Neurona($"Neurona_{i}", numeroNeuronas, numeroNeuronasCapaSiguiente, tipo);
+					Neuronas[i] = new Neurona($"Neurona_Oculta_{i}", numeroNeuronas, numeroNeuronasCapaSiguiente, tipo);
+				}
+			}
+			else if (tipo == TipoCapa.Salida)
+			{
+				for (int i = 0; i < numeroNeuronas; i++)
+				{
+					Neuronas[i] = new Neurona($"Neurona_Salida_{i}", numeroNeuronas, numeroNeuronasCapaSiguiente, tipo);
 				}
 			}
 		}

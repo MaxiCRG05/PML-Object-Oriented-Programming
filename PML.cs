@@ -48,17 +48,16 @@ namespace Perceptron_Multicapa_Colores
 
 				for (int i = 0; i < VariablesGlobales.Entradas.Length; i++)
 				{
-					double[] salidaCalculada = Propagacion(VariablesGlobales.Entradas[i]);
+					double[] salidaObtenida = Propagacion(VariablesGlobales.Entradas[i]);
 					Retropropagacion(VariablesGlobales.Salidas[i]);
 
 					for (int j = 0; j < VariablesGlobales.Salidas[i].Length; j++)
 					{
-						errorEpoca += Math.Pow(VariablesGlobales.Salidas[i][j] - salidaCalculada[j], 2);
+						errorEpoca += Math.Pow(VariablesGlobales.Salidas[i][j] - salidaObtenida[j], 2);
 					}
 				}
 
 				errorEpoca /= (VariablesGlobales.Entradas.Length * VariablesGlobales.Salidas[0].Length);
-
 				Console.WriteLine($"Epoca {epoca} Error: {errorEpoca}");
 
 				if (errorEpoca < mejorError)
@@ -71,20 +70,20 @@ namespace Perceptron_Multicapa_Colores
 					epocasSinMejora++;
 					if (epocasSinMejora >= VariablesGlobales.Paciencia)
 					{
-						Console.WriteLine($"Entrenamiento detenido en la época {epoca + 1}. Error: {errorEpoca}");
-						MessageBox.Show($"Entrenamiento detenido en la época {epoca + 1}. Error: {errorEpoca}", "Entrenamiento");
-
+						Console.WriteLine($"Entrenamiento detenido en la época {epoca + 1}. Error: {errorEpoca}.");
+						MessageBox.Show($"Entrenamiento detenido en la época {epoca + 1}. Error: {errorEpoca}.", "Entrenamiento");
 						break;
 					}
 				}
 
 				if (errorEpoca <= VariablesGlobales.ErrorMinimo)
 				{
-					Console.WriteLine($"Entrenamiento detenido en la época {epoca + 1}. El error se disminuyó: {errorEpoca}");
-					MessageBox.Show($"Entrenamiento detenido en la época {epoca + 1}. El error se disminuyó: {errorEpoca}", "Entrenamiento");
+					Console.WriteLine($"Entrenamiento detenido en la época {epoca + 1}. El error se disminuyó: {errorEpoca}.");
+					MessageBox.Show($"Entrenamiento detenido en la época {epoca + 1}. El error se disminuyó: {errorEpoca}.", "Entrenamiento");
 					break;
 				}
 			}
+			MessageBox.Show($"Entrenamiento finalizado.", "Entrenamiento");
 		}
 
 		/// <summary>
@@ -110,26 +109,22 @@ namespace Perceptron_Multicapa_Colores
 					{
 						suma += Capas[c - 1].Neuronas[k].Salida * Capas[c].Neuronas[j].Pesos[k];
 					}
-					Capas[c].Neuronas[c].Pesos[j] = FuncionActivacion(suma + Capas[c].Neuronas[j].Bias);
+					Capas[c].Neuronas[j].Salida = FuncionActivacion(suma + Capas[c].Neuronas[j].Bias);
 				}
+			}
+
+			double[] salidas = new double[Capas[Capas.Length - 1].Neuronas.Length];
+			for (int i = 0; i < salidas.Length; i++)
+			{
+				salidas[i] = Capas[Capas.Length - 1].Neuronas[i].Salida;
 			}
 
 			if (Capas[Capas.Length - 1].Tipo == Capa.TipoCapa.Salida)
 			{
-				double[] salidas = new double[Capas[Capas.Length - 1].Neuronas.Length];
-				for (int i = 0; i < salidas.Length; i++)
-				{
-					salidas[i] = Capas[Capas.Length - 1].Neuronas[i].Salida;
-				}
 				return Softmax(salidas);
 			}
 
-			double[] salidasFinales = new double[Capas[Capas.Length - 1].Neuronas.Length];
-			for (int i = 0; i < salidasFinales.Length; i++)
-			{
-				salidasFinales[i] = Capas[Capas.Length - 1].Neuronas[i].Salida;
-			}
-			return salidasFinales;
+			return salidas;
 		}
 
 		/// <summary>
@@ -148,14 +143,14 @@ namespace Perceptron_Multicapa_Colores
 
 			for (int c = Capas.Length - 2; c >= 0; c--)
 			{
-				for (int i = 0; i < Capas[c].Neuronas.Length; i++)
+				for (int j = 0; j < Capas[c].Neuronas.Length; j++)
 				{
 					double error = 0;
-					for (int j = 0; j < Capas[c + 1].Neuronas.Length; j++)
+					for (int i = 0; i < Capas[c + 1].Neuronas.Length; i++)
 					{
-						error += Capas[c + 1].Neuronas[j].Delta * Capas[c + 1].Neuronas[j].Pesos[i];
+						error += Capas[c + 1].Neuronas[i].Delta * Capas[c + 1].Neuronas[i].Pesos[j];
 					}
-					Capas[c].Neuronas[i].Delta = error * FuncionDeActivacionDerivada(Capas[c].Neuronas[i].Salida);
+					Capas[c].Neuronas[j].Delta = error * FuncionDeActivacionDerivada(Capas[c].Neuronas[j].Salida);
 				}
 			}
 
