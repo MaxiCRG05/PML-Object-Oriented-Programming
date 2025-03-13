@@ -112,7 +112,7 @@ namespace Perceptron_Multicapa_Colores
         private void button2_MouseClick(object sender, MouseEventArgs e)
         {
             button2.Enabled = false;
-            perceptronMultiCapa.Entrenar(VariablesGlobales.Entradas, VariablesGlobales.Salidas, VariablesGlobales.Epocas);
+            perceptronMultiCapa.Entrenar();
             btnProbar.Enabled = true;
 
         }

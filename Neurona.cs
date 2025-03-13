@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using static Perceptron_Multicapa_Colores.Capa;
 
 namespace Perceptron_Multicapa_Colores
 {
@@ -8,10 +10,16 @@ namespace Perceptron_Multicapa_Colores
 	/// </summary>
 	public class Neurona
 	{
+
+		/// <summary>
+		/// Generador de números.
+		/// </summary>
+		readonly Random rand = new Random();
+
 		/// <summary>
 		/// Nombre de la neurona.
 		/// </summary>
-		public string Nombre { get; set; }
+		public String Nombre { get; set; }
 
 		/// <summary>
 		/// Pesos de la neurona dependiendo de las entradas que reciba.
@@ -36,57 +44,67 @@ namespace Perceptron_Multicapa_Colores
 		/// <summary>
 		/// Lista de neuronas de la capa siguiente.
 		/// </summary>
-		public List<Neurona> NeuronasSiguientes;
+		public List<Neurona> NeuronasSiguientes = new List<Neurona>();
 
 		/// <summary>
 		/// Lista de neuronas de la capa anterior.
 		/// </summary>
-		public List<Neurona> NeuronasAnteriores;
+		public List<Neurona> NeuronasAnteriores = new List<Neurona>();
 
 		/// <summary>
 		/// Constructor de la clase Neurona.
 		/// </summary>
 		/// <param name="nombre">Nombre de la neurona.</param>
 		/// <param name="numeroPesos">Número de pesos (conexiones con la capa anterior).</param>
-		public Neurona(string name, int numeroNeuronasSiguientes)
+		public Neurona(String name, int numeroEntradas, TipoCapa tipoCapa, int[] capas)
 		{
-			NeuronasSiguientes = new List<Neurona>();
-			NeuronasAnteriores = new List<Neurona>();
 			Nombre = name;
+			Pesos = new double[numeroEntradas];
 
-			if (numeroNeuronasSiguientes > 0)
+			if (tipoCapa == TipoCapa.Entrada) 
 			{
-				Pesos = new double[numeroNeuronasSiguientes];
-				Random rand = new Random();
-				for (int w = 0; w < numeroNeuronasSiguientes; w++)
-				{
-					Pesos[w] = rand.NextDouble(); 
-				}
-				Bias = rand.NextDouble();
+				for (int i = 0; i < numeroEntradas; i++)
+					IniciarPesos(capas);
 			}
-			else
+			else if (tipoCapa == TipoCapa.Oculta)
 			{
-				Pesos = null;
-				Bias = 0;
+				for (int i = 0; i < numeroEntradas; i++)
+					IniciarPesos(capas);
+				IniciarBias();
 			}
-			Delta = 0;
-			Salida = 0;
+			else if (tipoCapa == TipoCapa.Salida) 
+			{
+				IniciarBias();
+			}
 		}
 
 		/// <summary>
-		/// Método para agregar una neurona e interconectarla con las otras neuronas.
+		/// Método para conectar una neurona con la siguiente.
 		/// </summary>
-		/// <param name="tipo"></param>
-		public void agregarNeurona(bool tipo)
+		/// <param name="neuronaSiguiente">Neurona siguiente para conectarla.</param>
+		public void ConectarNeuronaSiguiente(Neurona neuronaSiguiente)
 		{
-			if (tipo)
+			NeuronasSiguientes.Add(neuronaSiguiente);
+			neuronaSiguiente.NeuronasAnteriores.Add(this);
+		}
+
+		//MÉTODO DE XAVIER (GLOROT)
+		private void IniciarPesos(int[] capas)
+		{
+			for (int i = 0; i < capas.Length - 1; i++)
 			{
-				NeuronasSiguientes.Add(new Neurona($"Neurona_{NeuronasSiguientes.Count}", NeuronasSiguientes.Count));
+				int n_in = capas[i];
+				int n_out = capas[i + 1];
+				double limit = (double)Math.Sqrt(6.0 / (n_in + n_out));
+
+				Pesos[i] = (double)(rand.NextDouble() * 2 * limit - limit);
+					
 			}
-			else
-			{
-				NeuronasAnteriores.Add(new Neurona($"Neurona_{NeuronasAnteriores.Count}", NeuronasAnteriores.Count));
-			}
+		}
+
+		private void IniciarBias()
+		{
+			Bias = (double)new Random().NextDouble() - 0.5f;
 		}
 	}
 }
