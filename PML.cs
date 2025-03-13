@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -17,7 +18,7 @@ namespace Perceptron_Multicapa_Colores
 		/// <summary>
 		/// Archivo para manejar los archivos.
 		/// </summary>
-		public readonly Archivos archivo;
+		public readonly Archivos archivo = new Archivos(VariablesGlobales.Ruta);
 
 		/// <summary>
 		/// Constructor de la clase PML
@@ -330,19 +331,20 @@ namespace Perceptron_Multicapa_Colores
 		{
 			try
 			{
-				for (int i = 0; i < Capas.Length; i++)
+				for(int c = 0; c < Capas.Length; c++)
 				{
-					if (Capas[i].Tipo != Capa.TipoCapa.Entrada)
+					archivo.EscribirArchivo($"Capa {c}:", VariablesGlobales.Configuracion + VariablesGlobales.FormatoArchivos);
+
+					for (int j = 0; j < Capas[c].Neuronas.Length ; j++)
 					{
-						archivo.EscribirArchivo($"Capa {i}:", VariablesGlobales.Configuracion + VariablesGlobales.FormatoArchivos);
-						for (int j = 0; j < Capas[i].Neuronas.Length; j++)
+						archivo.EscribirArchivo($"Neurona {j}:", VariablesGlobales.Configuracion + VariablesGlobales.FormatoArchivos);
+
+						for(int p = 0; p < Capas[c].Neuronas[j].Pesos.Length ; p++)
 						{
-							for (int k = 0; k < Capas[i].Neuronas[j].Pesos.Length; k++)
-							{
-								archivo.EscribirArchivo($"Peso[{i}][{j}][{k}] = {Capas[i].Neuronas[j].Pesos[k]}", VariablesGlobales.Configuracion + VariablesGlobales.FormatoArchivos);
-							}
-							archivo.EscribirArchivo($"Sesgo[{i}][{j}] = {Capas[i].Neuronas[j].Bias}", VariablesGlobales.Configuracion + VariablesGlobales.FormatoArchivos);
+							archivo.EscribirArchivo($"Peso = {Capas[c].Neuronas[j].Pesos[p]}", VariablesGlobales.Configuracion + VariablesGlobales.FormatoArchivos);
 						}
+
+						archivo.EscribirArchivo($"Bias = {Capas[c].Neuronas[j].Bias}", VariablesGlobales.Configuracion + VariablesGlobales.FormatoArchivos);
 					}
 				}
 
