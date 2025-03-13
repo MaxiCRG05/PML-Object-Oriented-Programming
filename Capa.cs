@@ -35,7 +35,7 @@ namespace Perceptron_Multicapa_Colores
 		/// <param name="numeroNeuronas">Número de neuronas en la capa.</param>
 		/// <param name="numeroNeuronasCapaSiguiente">Número de neuronas en la capa siguiente.</param>
 		/// <param name="tipo">Tipo de capa (Entrada, Oculta o Salida).</param>
-		public Capa(int numeroNeuronas, int numeroNeuronasCapaSiguiente, TipoCapa tipo, int[] capas, Capa CapaSiguiente = null)
+		public Capa(int numeroNeuronas, int numeroNeuronasCapaSiguiente, TipoCapa tipo)
 		{
 			Tipo = tipo;
 			Neuronas = new Neurona[numeroNeuronas];
@@ -44,25 +44,14 @@ namespace Perceptron_Multicapa_Colores
 			{
 				for (int i = 0; i < numeroNeuronas; i++)
 				{
-					Neuronas[i] = new Neurona($"Neurona_{i}", 0, tipo, capas);
+					Neuronas[i] = new Neurona($"Neurona_{i}", numeroNeuronas, numeroNeuronasCapaSiguiente, tipo);
 				}
 			}
 			else
 			{
 				for (int i = 0; i < numeroNeuronas; i++)
 				{
-					Neuronas[i] = new Neurona($"Neurona_{i}", numeroNeuronasCapaSiguiente, tipo, capas);
-				}
-			}
-
-			if (CapaSiguiente != null)
-			{
-				for (int i = 0; i < Neuronas.Length; i++)
-				{
-					for (int j = 0; j < CapaSiguiente.Neuronas.Length; j++)
-					{
-						CapaSiguiente.Neuronas[j].ConectarNeuronaSiguiente(Neuronas[i]);
-					}
+					Neuronas[i] = new Neurona($"Neurona_{i}", numeroNeuronas, numeroNeuronasCapaSiguiente, tipo);
 				}
 			}
 		}

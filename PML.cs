@@ -22,28 +22,21 @@ namespace Perceptron_Multicapa_Colores
 		/// <summary>
 		/// Constructor de la clase PML
 		/// </summary>
-		/// <param name="layers">Arreglo que define el número de neuronas en cada capa.</param>
-		public PML(int[] layers)
+		/// <param name="n">Arreglo que define el número de neuronas en cada capa.</param>
+		public PML(int[] n)
 		{
-			Capas = new Capa[layers.Length];
-			for (int c = 0; c < layers.Length; c++)
+			Capas = new Capa[n.Length];
+			for (int c = 0; c < n.Length; c++)
 			{
-				int neuronasCapaSiguiente = (c == layers.Length - 1) ? 0 : layers[c + 1];
-				Capa.TipoCapa tipo = (c == 0) ? Capa.TipoCapa.Entrada : (c == layers.Length - 1) ? Capa.TipoCapa.Salida : Capa.TipoCapa.Oculta;
-				Capa capaSiguiente = (c < layers.Length - 1) ? Capas[c + 1] : null;
-				Capas[c] = new Capa(layers[c], neuronasCapaSiguiente, tipo, layers, capaSiguiente);
+				int neuronasCapaSiguiente = (c == n.Length - 1) ? 0 : n[c + 1];
+				Capa.TipoCapa tipo = (c == 0) ? Capa.TipoCapa.Entrada : (c == n.Length - 1) ? Capa.TipoCapa.Salida : Capa.TipoCapa.Oculta;
+				Capas[c] = new Capa(n[c], neuronasCapaSiguiente, tipo);
 			}
 		}
 
 		/// <summary>
 		/// Método para entrenar la red neuronal
 		/// </summary>
-		/// <param name="entradas">Conjunto de datos de entrada.</param>
-		/// <param name="salidas">Conjunto de datos de salida esperados.</param>
-		/// <param name="tasaAprendizaje">Tasa de aprendizaje.</param>
-		/// <param name="epocas">Número de épocas de entrenamiento.</param>
-		/// <param name="min">Valor mínimo para normalización.</param>
-		/// <param name="max">Valor máximo para normalización.</param>
 		public void Entrenar()
 		{
 			double mejorError = double.MaxValue;
@@ -66,6 +59,8 @@ namespace Perceptron_Multicapa_Colores
 
 				errorEpoca /= (VariablesGlobales.Entradas.Length * VariablesGlobales.Salidas[0].Length);
 
+				Console.WriteLine($"Epoca {epoca} Error: {errorEpoca}");
+
 				if (errorEpoca < mejorError)
 				{
 					mejorError = errorEpoca;
@@ -77,6 +72,8 @@ namespace Perceptron_Multicapa_Colores
 					if (epocasSinMejora >= VariablesGlobales.Paciencia)
 					{
 						Console.WriteLine($"Entrenamiento detenido en la época {epoca + 1}. Error: {errorEpoca}");
+						MessageBox.Show($"Entrenamiento detenido en la época {epoca + 1}. Error: {errorEpoca}", "Entrenamiento");
+
 						break;
 					}
 				}
@@ -106,19 +103,17 @@ namespace Perceptron_Multicapa_Colores
 
 			for (int c = 1; c < Capas.Length; c++)
 			{
-				for (int i = 0; i < Capas[c].Neuronas.Length; i++)
+				for (int j = 0; j < Capas[c].Neuronas.Length; j++)
 				{
 					double suma = 0;
-					for (int j = 0; j < Capas[c - 1].Neuronas.Length; j++)
+					for (int k = 0; k < Capas[c - 1].Neuronas.Length; k++)
 					{
-						suma += Capas[c - 1].Neuronas[j].Salida * Capas[c - 1].Neuronas[j].Pesos[i];
+						suma += Capas[c - 1].Neuronas[k].Salida * Capas[c].Neuronas[j].Pesos[k];
 					}
-					suma += Capas[c].Neuronas[i].Bias;
-					Capas[c].Neuronas[i].Salida = FuncionActivacion(suma);
+					Capas[c].Neuronas[c].Pesos[j] = FuncionActivacion(suma + Capas[c].Neuronas[j].Bias);
 				}
 			}
 
-			// Aplicar Softmax en la capa de salida si es necesario
 			if (Capas[Capas.Length - 1].Tipo == Capa.TipoCapa.Salida)
 			{
 				double[] salidas = new double[Capas[Capas.Length - 1].Neuronas.Length];
@@ -129,7 +124,6 @@ namespace Perceptron_Multicapa_Colores
 				return Softmax(salidas);
 			}
 
-			// Devolver las salidas de la última capa
 			double[] salidasFinales = new double[Capas[Capas.Length - 1].Neuronas.Length];
 			for (int i = 0; i < salidasFinales.Length; i++)
 			{
@@ -145,7 +139,6 @@ namespace Perceptron_Multicapa_Colores
 		/// <param name="tasaAprendizaje">Tasa de aprendizaje.</param>
 		private void Retropropagacion(double[] salidaEsperada)
 		{
-			// Calcular el error en la capa de salida
 			for (int i = 0; i < Capas[Capas.Length - 1].Neuronas.Length; i++)
 			{
 				double output = Capas[Capas.Length - 1].Neuronas[i].Salida;
@@ -153,7 +146,6 @@ namespace Perceptron_Multicapa_Colores
 				Capas[Capas.Length - 1].Neuronas[i].Delta = error * FuncionDeActivacionDerivada(output);
 			}
 
-			// Retropropagación del error
 			for (int c = Capas.Length - 2; c >= 0; c--)
 			{
 				for (int i = 0; i < Capas[c].Neuronas.Length; i++)
@@ -161,22 +153,21 @@ namespace Perceptron_Multicapa_Colores
 					double error = 0;
 					for (int j = 0; j < Capas[c + 1].Neuronas.Length; j++)
 					{
-						error += Capas[c + 1].Neuronas[j].Delta * Capas[c].Neuronas[i].Pesos[j];
+						error += Capas[c + 1].Neuronas[j].Delta * Capas[c + 1].Neuronas[j].Pesos[i];
 					}
 					Capas[c].Neuronas[i].Delta = error * FuncionDeActivacionDerivada(Capas[c].Neuronas[i].Salida);
 				}
 			}
 
-			// Actualización de pesos y sesgos
 			for (int c = 0; c < Capas.Length - 1; c++)
 			{
-				for (int i = 0; i < Capas[c].Neuronas.Length; i++)
+				for (int j = 0; j < Capas[c + 1].Neuronas.Length; j++)
 				{
-					for (int j = 0; j < Capas[c + 1].Neuronas.Length; j++)
+					for (int i = 0; i < Capas[c].Neuronas.Length; i++)
 					{
-						Capas[c].Neuronas[i].Pesos[j] += VariablesGlobales.TasaAprendizaje * Capas[c + 1].Neuronas[j].Delta * Capas[c].Neuronas[i].Salida;
+						Capas[c + 1].Neuronas[j].Pesos[i] += VariablesGlobales.TasaAprendizaje * Capas[c + 1].Neuronas[j].Delta * Capas[c].Neuronas[i].Salida;
 					}
-					Capas[c].Neuronas[i].Bias += VariablesGlobales.TasaAprendizaje * Capas[c + 1].Neuronas[i].Delta;
+					Capas[c + 1].Neuronas[j].Bias += VariablesGlobales.TasaAprendizaje * Capas[c + 1].Neuronas[j].Delta;
 				}
 			}
 		}

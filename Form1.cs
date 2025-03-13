@@ -14,7 +14,7 @@ namespace Perceptron_Multicapa_Colores
 
         public Form1()
         {
-            perceptronMultiCapa = new PML(VariablesGlobales.DatosPerceptron);
+            perceptronMultiCapa = new PML(VariablesGlobales.n);
 
             archivos = new Archivos(VariablesGlobales.Ruta);
             archivos.BuscarArchivo(VariablesGlobales.Datos + VariablesGlobales.FormatoArchivos);
