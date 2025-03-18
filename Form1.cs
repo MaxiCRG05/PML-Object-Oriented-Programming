@@ -5,14 +5,30 @@ using System.Windows.Forms;
 
 namespace Perceptron_Multicapa_Colores
 {
+    /// <summary>
+    /// Clase principal del formulario.
+    /// </summary>
     public partial class Form1 : Form
     {
-        readonly Archivos archivos;
-        readonly PML perceptronMultiCapa;
+		/// <summary>
+		/// Instancia de la clase Archivos para manejar los archivos.
+		/// </summary>
+		readonly Archivos archivos;
 
-        public Color color;
+		/// <summary>
+		/// Instancia de la clase PML para manejar el perceptrón multicapa.
+		/// </summary>
+		readonly PML perceptronMultiCapa;
 
-        public Form1()
+		/// <summary>
+		/// Color seleccionado.
+		/// </summary>
+		public Color color;
+
+		/// <summary>
+		/// Constructor de la clase Form1.
+		/// </summary>
+		public Form1()
         {
             perceptronMultiCapa = new PML(VariablesGlobales.n);
 
@@ -39,7 +55,12 @@ namespace Perceptron_Multicapa_Colores
             }
         }
 
-        private void btnProbar_Click(object sender, EventArgs e)
+		/// <summary>
+		/// Método para probar el perceptrón multicapa y poder predecir el resultado.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void btnProbar_Click(object sender, EventArgs e)
         {
             double[] entradas = { color.R, color.G, color.B };
 
@@ -53,17 +74,32 @@ namespace Perceptron_Multicapa_Colores
             archivos.EscribirArchivo($"[{color.R}, {color.G}, {color.B}]\t Predicción: {nombreColor}", VariablesGlobales.Datos + VariablesGlobales.FormatoArchivos);
 		}
 
+		/// <summary>
+		/// Método para guardar los pesos del perceptrón multicapa.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void btnGuardar_MouseClick(object sender, MouseEventArgs e)
         {
             perceptronMultiCapa.GuardarDatos();  
         }
 
-        private void btnLimpiarPesos_MouseClick(object sender, MouseEventArgs e)
+		/// <summary>
+		/// Método para limpiar los pesos del archivo de configuración del perceptrón multicapa.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void btnLimpiarPesos_MouseClick(object sender, MouseEventArgs e)
         {
             archivos.CrearArchivo(VariablesGlobales.Configuracion + VariablesGlobales.FormatoArchivos);
         }
 
-        private void btnImagen1_MouseClick(object sender, MouseEventArgs e)
+		/// <summary>
+		/// Método para cargar la imagen 1 y colocarla en el pictureBox1.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void btnImagen1_MouseClick(object sender, MouseEventArgs e)
         {
             try
             {
@@ -76,7 +112,12 @@ namespace Perceptron_Multicapa_Colores
             }
         }
 
-        private void btnImagen2_MouseClick_1(object sender, MouseEventArgs e)
+		/// <summary>
+		/// Método para cargar la imagen 2 y colocarla en el pictureBox1.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void btnImagen2_MouseClick_1(object sender, MouseEventArgs e)
         {
             try
             {
@@ -89,7 +130,12 @@ namespace Perceptron_Multicapa_Colores
             }
         }
 
-        private void btnImagenPersonalizada_MouseClick(object sender, MouseEventArgs e)
+		/// <summary>
+		/// Método para cargar una imagen personalizada y colocarla en el pictureBox1.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void btnImagenPersonalizada_MouseClick(object sender, MouseEventArgs e)
         {
             try
             {
@@ -110,7 +156,12 @@ namespace Perceptron_Multicapa_Colores
             }
         }
 
-        private void button2_MouseClick(object sender, MouseEventArgs e)
+		/// <summary>
+		/// Método para entrenar el perceptrón multicapa.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void button2_MouseClick(object sender, MouseEventArgs e)
         {
             button2.Enabled = false;
             perceptronMultiCapa.Entrenar();
@@ -118,7 +169,12 @@ namespace Perceptron_Multicapa_Colores
 
         }
 
-        private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
+		/// <summary>
+		/// Método para obtener el color del pixel seleccionado en el pictureBox1.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
         {
             if (pictureBox1.Image != null)
             {
@@ -134,7 +190,12 @@ namespace Perceptron_Multicapa_Colores
             }
         }
 
-        private void button1_MouseClick(object sender, MouseEventArgs e)
+		/// <summary>
+		/// Método para limpiar el registro de colores y el label2.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void button1_MouseClick(object sender, MouseEventArgs e)
         {
             registroColores.Text = "";
             label2.Text = "";
