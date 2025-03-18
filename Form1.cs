@@ -50,9 +50,10 @@ namespace Perceptron_Multicapa_Colores
             string nombreColor = VariablesGlobales.NombresColores[clasePredicha];
 
             label2.Text = $"{nombreColor}";
-        }
+            archivos.EscribirArchivo($"[{color.R}, {color.G}, {color.B}]\t Predicción: {nombreColor}", VariablesGlobales.Datos + VariablesGlobales.FormatoArchivos);
+		}
 
-        private void btnGuardar_MouseClick(object sender, MouseEventArgs e)
+		private void btnGuardar_MouseClick(object sender, MouseEventArgs e)
         {
             perceptronMultiCapa.GuardarDatos();  
         }
@@ -126,7 +127,6 @@ namespace Perceptron_Multicapa_Colores
                 int y = e.Y * bitmap.Height / pictureBox1.ClientSize.Height;
                 color = bitmap.GetPixel(x, y);
                 registroColores.Text += $"R: {color.R} \tG: {color.G} \tB: {color.B}\n";
-                archivos.EscribirArchivo($"[{color.R}, {color.G}, {color.B}]", VariablesGlobales.Datos + VariablesGlobales.FormatoArchivos);
             }
             else
             {

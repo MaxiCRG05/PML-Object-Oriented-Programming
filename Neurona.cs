@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
 using static Perceptron_Multicapa_Colores.Capa;
 
 namespace Perceptron_Multicapa_Colores

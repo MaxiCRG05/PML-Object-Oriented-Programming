@@ -33,7 +33,7 @@ namespace Perceptron_Multicapa_Colores
 		/// Min: Valor mínimo dentro del contexto de los datos.
 		/// Max: Valor máximo dentro del contexto de los datos.
 		/// </summary>
-		public static readonly int Epocas = 1000000, Min = 0, Max = 255, Paciencia = 10000;
+		public static readonly int Epocas = 100000, Min = 0, Max = 255, Paciencia = 10000;
 
 		/// <summary>
 		/// TasaAprendizaje: Factor de aprendizaje.

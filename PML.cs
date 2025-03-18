@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -266,24 +268,37 @@ namespace Perceptron_Multicapa_Colores
 		{
 			try
 			{
-				string line;
+				if (!File.Exists(VariablesGlobales.Configuracion + VariablesGlobales.FormatoArchivos))
+				{
+					MessageBox.Show($"El archivo {VariablesGlobales.Configuracion + VariablesGlobales.FormatoArchivos} no existe.", "Error");
+					return false;
+				}
+
 				int capaActual = -1;
 				int neuronaActual = 0;
 				int pesoActual = 0;
 
-				while ((line = archivo.LeerArchivo(VariablesGlobales.Configuracion + VariablesGlobales.FormatoArchivos)) != null)
+				List<string> lineas = archivo.LeerArchivo(VariablesGlobales.Configuracion + VariablesGlobales.FormatoArchivos);
+
+				foreach(string linea in lineas)
 				{
-					if (line.StartsWith("Capa"))
+					if (linea.StartsWith("Capa"))
 					{
 						capaActual++;
 						neuronaActual = 0;
 						pesoActual = 0;
 					}
-					else if (line.StartsWith("Peso"))
+					else if (linea.StartsWith("Peso"))
 					{
 						if (Capas[capaActual].Tipo != Capa.TipoCapa.Entrada)
 						{
-							string[] partes = line.Split('=');
+							string[] partes = linea.Split('=');
+							if (partes.Length != 2)
+							{
+								MessageBox.Show($"Formato incorrecto en la línea: {linea}", "Error");
+								return false;
+							}
+
 							double peso = double.Parse(partes[1].Trim());
 
 							if (capaActual >= 0 && capaActual < Capas.Length && neuronaActual < Capas[capaActual].Neuronas.Length)
@@ -298,11 +313,17 @@ namespace Perceptron_Multicapa_Colores
 							}
 						}
 					}
-					else if (line.StartsWith("Sesgo"))
+					else if (linea.StartsWith("Bias"))
 					{
 						if (Capas[capaActual].Tipo != Capa.TipoCapa.Entrada)
 						{
-							string[] partes = line.Split('=');
+							string[] partes = linea.Split('=');
+							if (partes.Length != 2)
+							{
+								MessageBox.Show($"Formato incorrecto en la línea: {linea}", "Error");
+								return false;
+							}
+
 							double sesgo = double.Parse(partes[1].Trim());
 
 							if (capaActual >= 0 && capaActual < Capas.Length && neuronaActual < Capas[capaActual].Neuronas.Length)
@@ -337,8 +358,6 @@ namespace Perceptron_Multicapa_Colores
 
 					for (int j = 0; j < Capas[c].Neuronas.Length ; j++)
 					{
-						archivo.EscribirArchivo($"Neurona {j}:", VariablesGlobales.Configuracion + VariablesGlobales.FormatoArchivos);
-
 						for(int p = 0; p < Capas[c].Neuronas[j].Pesos.Length ; p++)
 						{
 							archivo.EscribirArchivo($"Peso = {Capas[c].Neuronas[j].Pesos[p]}", VariablesGlobales.Configuracion + VariablesGlobales.FormatoArchivos);

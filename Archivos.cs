@@ -110,22 +110,25 @@ namespace Perceptron_Multicapa_Colores
 		/// </summary>
 		/// <param name="nombreArchivo">Nombre del archivo en el que se va a escribir.</param>
 		/// <returns>Regresa el texto btenido de una linea.</returns>
-		public string LeerArchivo(string nombreArchivo)
+		public List<string> LeerArchivo(string nombreArchivo)
 		{
-			string texto;
+			List<string> lineas = new List<string>();
 			try
 			{
 				sr = new StreamReader(ruta + nombreArchivo);
-				texto = sr.ReadLine();
+				string linea;
+				while ((linea = sr.ReadLine()) != null)
+				{
+					lineas.Add(linea);
+				}
 				sr.Close();
-				return texto;
 			}
-			catch(Exception e)
+			catch (Exception e)
 			{
-				MessageBox.Show($"No se ha podido leer el archivo debido a un error.\n Error:\n {e.Message}", caption: $"Archivo: {nombreArchivo}");
+				MessageBox.Show($"No se ha podido leer el archivo debido a un error.\nError:\n{e.Message}", caption: $"Archivo: {nombreArchivo}");
 				Console.WriteLine($"Excepcion: {e.Message}");
-				return "";
 			}
+			return lineas;
 		}
 	}
 }
