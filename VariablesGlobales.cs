@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -11,7 +12,7 @@ namespace Perceptron_Multicapa_Colores
 	/// <summary>
 	/// Clase para manejar las variables globales las cuales se usarán a lo largo del sistema.
 	/// </summary>
-	public class VariablesGlobales
+	public static class VariablesGlobales
 	{
 		/// <summary>
 		/// Escritorio: Ruta de cada entorno al escritorio.
@@ -256,7 +257,7 @@ namespace Perceptron_Multicapa_Colores
 		/// <summary>
 		/// Constructor para iniciar y comprobar si existe la carpeta "Archivos". Si no la encuentra la crea.
 		/// </summary>
-		public VariablesGlobales()
+		static VariablesGlobales()
 		{
 			try
 			{

@@ -200,5 +200,20 @@ namespace Perceptron_Multicapa_Colores
             registroColores.Text = "";
             label2.Text = "";
         }
-    }
+
+		private void pictureBox1_MouseDoubleClick(object sender, MouseEventArgs e)
+		{
+			double[] entradas = { color.R, color.G, color.B };
+
+			double[] salida = perceptronMultiCapa.Propagacion(entradas);
+
+			int clasePredicha = Array.IndexOf(salida, salida.Max());
+
+			string nombreColor = VariablesGlobales.NombresColores[clasePredicha];
+
+			label2.Text = $"{nombreColor}";
+			archivos.EscribirArchivo($"[{color.R}, {color.G}, {color.B}]\t Predicción: {nombreColor}", VariablesGlobales.Datos + VariablesGlobales.FormatoArchivos);
+            MessageBox.Show($"Predicción: {nombreColor}");
+		}
+	}
 }

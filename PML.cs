@@ -56,7 +56,7 @@ namespace Perceptron_Multicapa_Colores
 
 					for (int j = 0; j < VariablesGlobales.Salidas[i].Length; j++)
 					{
-						errorEpoca += Math.Pow(VariablesGlobales.Salidas[i][j] - salidaObtenida[j], 2);
+						errorEpoca += Math.Pow(salidaObtenida[j] - VariablesGlobales.Salidas[i][j], 2) / 2;
 					}
 				}
 
