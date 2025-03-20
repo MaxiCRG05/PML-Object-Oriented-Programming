@@ -37,7 +37,7 @@ namespace Perceptron_Multicapa_Colores
 
             InitializeComponent();
 
-            if (archivos.BuscarArchivo(VariablesGlobales.Configuracion + VariablesGlobales.FormatoArchivos))
+			if (archivos.BuscarArchivo(VariablesGlobales.Configuracion + VariablesGlobales.FormatoArchivos))
             {
                 DialogResult dialog = MessageBox.Show($"El archivo, si se ha encontrado. ¿Deseas cargar los pesos?", caption: "Perceptron", buttons: MessageBoxButtons.YesNo);
                 if (dialog == DialogResult.Yes)
@@ -55,6 +55,20 @@ namespace Perceptron_Multicapa_Colores
             }
         }
 
+        private void Probar()
+        {
+			double[] entradas = { color.R, color.G, color.B };
+
+			double[] salida = perceptronMultiCapa.Propagacion(entradas);
+
+			int clasePredicha = Array.IndexOf(salida, salida.Max());
+
+			string nombreColor = VariablesGlobales.NombresColores[clasePredicha];
+
+			label2.Text = $"{nombreColor}";
+			archivos.EscribirArchivo($"[{color.R}, {color.G}, {color.B}]\t Predicción: {nombreColor}", VariablesGlobales.Datos + VariablesGlobales.FormatoArchivos);
+		}
+
 		/// <summary>
 		/// Método para probar el perceptrón multicapa y poder predecir el resultado.
 		/// </summary>
@@ -62,17 +76,8 @@ namespace Perceptron_Multicapa_Colores
 		/// <param name="e"></param>
 		private void btnProbar_Click(object sender, EventArgs e)
         {
-            double[] entradas = { color.R, color.G, color.B };
-
-            double[] salida = perceptronMultiCapa.Propagacion(entradas);
-
-            int clasePredicha = Array.IndexOf(salida, salida.Max());
-            
-            string nombreColor = VariablesGlobales.NombresColores[clasePredicha];
-
-            label2.Text = $"{nombreColor}";
-            archivos.EscribirArchivo($"[{color.R}, {color.G}, {color.B}]\t Predicción: {nombreColor}", VariablesGlobales.Datos + VariablesGlobales.FormatoArchivos);
-		}
+            Probar();    
+        }
 
 		/// <summary>
 		/// Método para guardar los pesos del perceptrón multicapa.
@@ -203,17 +208,7 @@ namespace Perceptron_Multicapa_Colores
 
 		private void pictureBox1_MouseDoubleClick(object sender, MouseEventArgs e)
 		{
-			double[] entradas = { color.R, color.G, color.B };
-
-			double[] salida = perceptronMultiCapa.Propagacion(entradas);
-
-			int clasePredicha = Array.IndexOf(salida, salida.Max());
-
-			string nombreColor = VariablesGlobales.NombresColores[clasePredicha];
-
-			label2.Text = $"{nombreColor}";
-			archivos.EscribirArchivo($"[{color.R}, {color.G}, {color.B}]\t Predicción: {nombreColor}", VariablesGlobales.Datos + VariablesGlobales.FormatoArchivos);
-            MessageBox.Show($"Predicción: {nombreColor}");
+            Probar();
 		}
 	}
 }
