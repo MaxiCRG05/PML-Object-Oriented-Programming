@@ -34,20 +34,20 @@ namespace Perceptron_Multicapa_Colores
 		/// Min: Valor mínimo dentro del contexto de los datos.
 		/// Max: Valor máximo dentro del contexto de los datos.
 		/// </summary>
-		public static readonly int Epocas = 100000, Min = 0, Max = 255, Paciencia = 10000;
+		public static readonly int Epocas = 100000, Min = 0, Max = 255, Paciencia = 100000;
 
 		/// <summary>
 		/// TasaAprendizaje: Factor de aprendizaje.
 		/// ErrorMinimo: Error mínimo el cual se espera alcanzar.
 		/// </summary>
-		public static readonly double TasaAprendizaje = 0.01f, ErrorMinimo = 0.001f;
+		public static double TasaAprendizaje = 0.5, ErrorMinimo = 1e-5;
 
 		/// <summary>
 		/// n: Datos que se utilizarán para el perceptrón multicapa.
 		/// {Número de datos que va
 		/// n a entrar, Número de neuronas en cada capa oculta (pueden ser n número de capas	ocultas), Número de datos que van a salir }
 		/// </summary>
-		public static readonly int[] n = { 3, 10, 10, 12 };
+		public static readonly int[] n = { 3, 10, 12 };
 
 		/// <summary>
 		/// NombresColores: Datos que se utilizarán para que el perceptrón multicapa analice

@@ -12,15 +12,28 @@ namespace Perceptron_Multicapa_Colores
 	/// </summary>
 	class PML
 	{
+		double errorMuestra = 0;
 		/// <summary>
 		/// Arreglo de capas de la red neuronal.
 		/// </summary>
-		private readonly Capa[] Capas;
+		private readonly List<Capa> capas = new List<Capa>();
 
 		/// <summary>
-		/// Archivo para manejar los archivos.
+		/// Epocas alcanzadas para el entrenamiento
 		/// </summary>
-		public readonly Archivos archivo = new Archivos(VariablesGlobales.Ruta);
+		public int epocasAlcanzadas = 0;
+
+		/// <summary>
+		/// errorEpoca: Es el error de cada epoca.
+		/// mejorError: Es el mejor error de cada epoca.
+		/// totalPatrones: Es el total de patrones que se van a entrenar.
+		/// </summary>
+		public double errorEpoca = 0, mejorError = 0, totalPatrones = VariablesGlobales.Entradas.Length;
+
+		/// <summary>
+		/// Instancia para manejar los archivos.
+		/// </summary>
+		private readonly Archivos archivo = new Archivos(VariablesGlobales.Ruta);
 
 		/// <summary>
 		/// Constructor de la clase PML
@@ -28,64 +41,135 @@ namespace Perceptron_Multicapa_Colores
 		/// <param name="n">Arreglo que define el número de neuronas en cada capa.</param>
 		public PML(int[] n)
 		{
-			Capas = new Capa[n.Length];
 			for (int c = 0; c < n.Length; c++)
 			{
 				int neuronasCapaSiguiente = (c == n.Length - 1) ? 0 : n[c + 1];
-				Capa.TipoCapa tipo = (c == 0) ? Capa.TipoCapa.Entrada : (c == n.Length - 1) ? Capa.TipoCapa.Salida : Capa.TipoCapa.Oculta;
-				Capas[c] = new Capa(n[c], neuronasCapaSiguiente, tipo);
+				Capa.TipoCapa tipo = (c == 0) ? Capa.TipoCapa.Entrada :
+									  (c == n.Length - 1) ? Capa.TipoCapa.Salida :
+									  Capa.TipoCapa.Oculta;
+				capas.Add(new Capa(n[c], neuronasCapaSiguiente, tipo));
 			}
+
+			crearConexiones();
+		}
+
+		/// <summary>
+		/// Crea las conexiones entre las neuronas
+		/// </summary>
+		public void crearConexiones()
+		{
+			for (int c = 0; c < capas.Count - 1; c++)
+			{
+				for (int i = 0; i < capas[c].neuronas.Count; i++)
+				{
+					for (int j = 0; j < capas[c + 1].neuronas.Count; j++)
+					{
+						capas[c].neuronas[i].neuronasSiguientes.Add(capas[c + 1].neuronas[j]);
+						capas[c + 1].neuronas[j].neuronasAnteriores.Add(capas[c].neuronas[i]);
+					}
+				}
+			}
+		}
+
+		public void calcularError(int i)
+		{
+			errorMuestra = 0;
+			for (int j = 0; j < VariablesGlobales.Salidas[i].Length; j++)
+			{
+				errorMuestra += Math.Pow(VariablesGlobales.Salidas[i][j] - capas[capas.Count - 1].neuronas[j].a, 2);
+			}
+			errorEpoca += errorMuestra / 2f;
+		}
+
+
+		public bool verificarErrorNAN(int epoca)
+		{
+			bool fallo = false;
+
+			if (double.IsNaN(errorEpoca))
+			{
+				Console.WriteLine($"NAN: Epoca {epoca + 1}: Error: {errorEpoca}");
+				fallo = true;
+			}
+			else
+				Console.WriteLine($"Epoca {epoca + 1}: Error: {errorEpoca}");
+
+			return fallo;
+		}
+
+		public bool verificarPaciencia(int epoca, ref int epocasSinMejora)
+		{
+			bool fallo = false;
+
+			if (errorEpoca < mejorError)
+			{
+				mejorError = errorEpoca;
+				epocasSinMejora = 0;
+			}
+			else
+			{
+				epocasSinMejora++;
+				if (epocasSinMejora >= VariablesGlobales.Paciencia)
+				{
+					Console.WriteLine($"Entrenamiento detenido en la época {epoca + 1}. Error: {errorEpoca}");
+					fallo = true;
+				}
+			}
+
+			return fallo;
+		}
+
+		public bool verificarErrorMinimo(int epoca)
+		{
+			bool fallo = false;
+
+			if (errorEpoca <= VariablesGlobales.ErrorMinimo)
+			{
+				Console.WriteLine($"Entrenamiento detenido en la época {epoca + 1}. El error se disminuyó: {errorEpoca}");
+				MessageBox.Show($"Entrenamiento detenido en la época {epoca + 1}. El error se disminuyó: {errorEpoca}", "Entrenamiento");
+				fallo = true;
+			}
+
+			return fallo;
 		}
 
 		/// <summary>
 		/// Método para entrenar la red neuronal
 		/// </summary>
-		public void Entrenar()
+		public void entrenar()
 		{
-			double mejorError = double.MaxValue;
 			int epocasSinMejora = 0;
+			mejorError = double.MaxValue;
 
 			for (int epoca = 0; epoca < VariablesGlobales.Epocas; epoca++)
 			{
-				double errorEpoca = 0;
+				errorEpoca = 0;
 
 				for (int i = 0; i < VariablesGlobales.Entradas.Length; i++)
 				{
-					double[] salidaObtenida = Propagacion(VariablesGlobales.Entradas[i]);
-					Retropropagacion(VariablesGlobales.Salidas[i]);
+					propagacion(VariablesGlobales.Entradas[i]);
 
-					for (int j = 0; j < VariablesGlobales.Salidas[i].Length; j++)
-					{
-						errorEpoca += Math.Pow(salidaObtenida[j] - VariablesGlobales.Salidas[i][j], 2) / 2;
-					}
+					calcularError(i);
+
+					retropropagacion(VariablesGlobales.Salidas[i]);
 				}
 
-				errorEpoca /= (VariablesGlobales.Entradas.Length * VariablesGlobales.Salidas[0].Length);
-				Console.WriteLine($"Epoca {epoca} Error: {errorEpoca}");
+				errorEpoca /= totalPatrones;
 
-				if (errorEpoca < mejorError)
-				{
-					mejorError = errorEpoca;
-					epocasSinMejora = 0;
-				}
-				else
-				{
-					epocasSinMejora++;
-					if (epocasSinMejora >= VariablesGlobales.Paciencia)
-					{
-						Console.WriteLine($"Entrenamiento detenido en la época {epoca + 1}. Error: {errorEpoca}.");
-						MessageBox.Show($"Entrenamiento detenido en la época {epoca + 1}. Error: {errorEpoca}.", "Entrenamiento");
-						break;
-					}
-				}
-
-				if (errorEpoca <= VariablesGlobales.ErrorMinimo)
-				{
-					Console.WriteLine($"Entrenamiento detenido en la época {epoca + 1}. El error se disminuyó: {errorEpoca}.");
-					MessageBox.Show($"Entrenamiento detenido en la época {epoca + 1}. El error se disminuyó: {errorEpoca}.", "Entrenamiento");
+				if (verificarErrorNAN(epoca))
 					break;
-				}
+
+				if (verificarPaciencia(epoca, ref epocasSinMejora))
+					break;
+
+				if (verificarErrorMinimo(epoca))
+					break;
+
+				epocasAlcanzadas++;
 			}
+
+			//guardarDatos();
+
 			MessageBox.Show($"Entrenamiento finalizado.", "Entrenamiento");
 		}
 
@@ -94,80 +178,44 @@ namespace Perceptron_Multicapa_Colores
 		/// </summary>
 		/// <param name="entradas">Entradas de la red.</param>
 		/// <returns>Salida de la red.</returns>
-		public double[] Propagacion(double[] entradas)
+		public double[] propagacion(double[] entradas)
 		{
-			entradas = NormalizarDatos(entradas);
+			double[] salidas = new double[capas[capas.Count - 1].neuronas.Count];
 
-			for (int i = 0; i < entradas.Length; i++)
-			{
-				Capas[0].Neuronas[i].Salida = entradas[i];
-			}
+			entradas = normalizarDatos(entradas);
 
-			for (int c = 1; c < Capas.Length; c++)
-			{
-				for (int j = 0; j < Capas[c].Neuronas.Length; j++)
-				{
-					double suma = 0;
-					for (int k = 0; k < Capas[c - 1].Neuronas.Length; k++)
-					{
-						suma += Capas[c - 1].Neuronas[k].Salida * Capas[c].Neuronas[j].Pesos[k];
-					}
-					Capas[c].Neuronas[j].Salida = FuncionActivacion(suma + Capas[c].Neuronas[j].Bias);
-				}
-			}
+			capas[0].calcularActivacion(entradas);
 
-			double[] salidas = new double[Capas[Capas.Length - 1].Neuronas.Length];
+			for (int c = 1; c < capas.Count; c++)
+				capas[c].calcularActivacion();
+
+			
 			for (int i = 0; i < salidas.Length; i++)
 			{
-				salidas[i] = Capas[Capas.Length - 1].Neuronas[i].Salida;
+				salidas[i] = capas[capas.Count - 1].neuronas[i].a;
 			}
 
-			if (Capas[Capas.Length - 1].Tipo == Capa.TipoCapa.Salida)
+			if (salidas.Length > 1)
 			{
-				return Softmax(salidas);
+				return softmax(salidas);
 			}
 
-			return salidas;
+			return salidas;  
 		}
 
 		/// <summary>
 		/// Realiza la retropropagación
 		/// </summary>
 		/// <param name="salidaEsperada">Salida esperada.</param>
-		/// <param name="tasaAprendizaje">Tasa de aprendizaje.</param>
-		private void Retropropagacion(double[] salidaEsperada)
+		private void retropropagacion(double[] salidaEsperada)
 		{
-			for (int i = 0; i < Capas[Capas.Length - 1].Neuronas.Length; i++)
-			{
-				double output = Capas[Capas.Length - 1].Neuronas[i].Salida;
-				double error = salidaEsperada[i] - output;
-				Capas[Capas.Length - 1].Neuronas[i].Delta = error * FuncionDeActivacionDerivada(output);
-			}
+			capas[capas.Count - 1].calcularError(salidaEsperada);
 
-			for (int c = Capas.Length - 2; c >= 0; c--)
-			{
-				for (int j = 0; j < Capas[c].Neuronas.Length; j++)
-				{
-					double error = 0;
-					for (int i = 0; i < Capas[c + 1].Neuronas.Length; i++)
-					{
-						error += Capas[c + 1].Neuronas[i].Delta * Capas[c + 1].Neuronas[i].Pesos[j];
-					}
-					Capas[c].Neuronas[j].Delta = error * FuncionDeActivacionDerivada(Capas[c].Neuronas[j].Salida);
-				}
-			}
+			for (int c = capas.Count - 2; c > 0; c--)
+				capas[c].calcularError();
 
-			for (int c = 0; c < Capas.Length - 1; c++)
-			{
-				for (int j = 0; j < Capas[c + 1].Neuronas.Length; j++)
-				{
-					for (int i = 0; i < Capas[c].Neuronas.Length; i++)
-					{
-						Capas[c + 1].Neuronas[j].Pesos[i] += VariablesGlobales.TasaAprendizaje * Capas[c + 1].Neuronas[j].Delta * Capas[c].Neuronas[i].Salida;
-					}
-					Capas[c + 1].Neuronas[j].Bias += VariablesGlobales.TasaAprendizaje * Capas[c + 1].Neuronas[j].Delta;
-				}
-			}
+			foreach (var capa in capas)
+				capa.actualizarBiasPesos();
 		}
 
 		/// <summary>
@@ -175,7 +223,7 @@ namespace Perceptron_Multicapa_Colores
 		/// </summary>
 		/// <param name="entrada">Valor a normalizar.</param>
 		/// <returns>Valor normalizado.</returns>
-		public double NormalizarDatos(double entrada)
+		public double normalizarDatos(double entrada)
 		{
 			return (entrada - VariablesGlobales.Min) / (VariablesGlobales.Max - VariablesGlobales.Min);
 		}
@@ -185,30 +233,30 @@ namespace Perceptron_Multicapa_Colores
 		/// </summary>
 		/// <param name="entradas">Arreglo de valores a normalizar.</param>
 		/// <returns>Arreglo de valores normalizados.</returns>
-		public double[] NormalizarDatos(double[] entradas)
+		public double[] normalizarDatos(double[] entradas)
 		{
 			double[] resultado = new double[entradas.Length];
 			for (int i = 0; i < entradas.Length; i++)
 			{
-				resultado[i] = NormalizarDatos(entradas[i]);
+				resultado[i] = normalizarDatos(entradas[i]);
 			}
 			return resultado;
 		}
-
 
 		/// <summary>
 		/// Realiza la predicción de la red.
 		/// </summary>
 		/// <param name="x">Datos que se van a procesar</param>
 		/// <returns>Los datos ya procesados</returns>
-		private double[] Softmax(double[] x)
+		private double[] softmax(double[] x)
 		{
+			double max = x.Max();
 			double[] exponenciales = new double[x.Length];
 			double sumaExponenciales = 0;
 
 			for (int i = 0; i < x.Length; i++)
 			{
-				exponenciales[i] = Math.Exp(x[i]);
+				exponenciales[i] = Math.Exp(x[i] - max);
 				sumaExponenciales += exponenciales[i];
 			}
 
@@ -221,158 +269,118 @@ namespace Perceptron_Multicapa_Colores
 		}
 
 		/// <summary>
-		/// Método para la función de activación: FUNCION RELU, LEAKY RELU Y SIGMOIDE
-		/// </summary>
-		/// <param name="x">Valor de entrada.</param>
-		/// <returns>Regresa el valor de entrada procesada con base a la función de activación.</returns>
-		private double FuncionActivacion(double x)
-		{
-			//SIGMOIDE
-			//return 1 / (1 + Math.Exp(-x));
-
-			//RELU
-			//return Math.Max(0,x);
-
-			// Leaky ReLU
-			return x > 0 ? x : 0.01 * x;
-
-			//ELU
-			//return x > 0 ? x : 0.01 * (Math.Exp(x) - 1);
-		}
-
-		/// <summary>
-		/// Método para la función de activación derivada: FUNCION RELU, LEAKY RELU Y SIGMOIDE DERIVADA
-		/// </summary>
-		/// <param name="x">Valor de entrada.</param>
-		/// <returns>La entrada ya procesada por la función de activación derivada.</returns>
-		private double FuncionDeActivacionDerivada(double x)
-		{
-			//SIGMOIDE
-			//return x * (1 - x);
-
-			//RELU
-			//return x > 0 ? 1 : 0;
-
-			//Leaky ReLU
-			return x > 0 ? 1 : 0.01;
-
-			//ELU
-			//return x > 0 ? 1 : 0.01 * Math.Exp(x);
-		}
-
-		/// <summary>
 		/// Carga los datos de configuración desde un archivo
 		/// </summary>
 		/// <returns>True si la carga fue exitosa, False en caso contrario.</returns>
-		public bool CargarDatos()
-		{
-			try
-			{
-				if (!File.Exists(VariablesGlobales.Configuracion + VariablesGlobales.FormatoArchivos))
-				{
-					MessageBox.Show($"El archivo {VariablesGlobales.Configuracion + VariablesGlobales.FormatoArchivos} no existe.", "Error");
-					return false;
-				}
+		//public bool cargarDatos()
+		//{
+		//	try
+		//	{
+		//		if (!File.Exists(VariablesGlobales.Configuracion + VariablesGlobales.FormatoArchivos))
+		//		{
+		//			MessageBox.Show($"El archivo {VariablesGlobales.Configuracion + VariablesGlobales.FormatoArchivos} no existe.", "Error");
+		//			return false;
+		//		}
 
-				int capaActual = -1;
-				int neuronaActual = 0;
-				int pesoActual = 0;
+		//		int capaActual = -1;
+		//		int neuronaActual = 0;
+		//		int pesoActual = 0;
 
-				List<string> lineas = archivo.LeerArchivo(VariablesGlobales.Configuracion + VariablesGlobales.FormatoArchivos);
+		//		List<string> lineas = archivo.LeerArchivo(VariablesGlobales.Configuracion + VariablesGlobales.FormatoArchivos);
 
-				foreach(string linea in lineas)
-				{
-					if (linea.StartsWith("Capa"))
-					{
-						capaActual++;
-						neuronaActual = 0;
-						pesoActual = 0;
-					}
-					else if (linea.StartsWith("Peso"))
-					{
-						if (Capas[capaActual].Tipo != Capa.TipoCapa.Entrada)
-						{
-							string[] partes = linea.Split('=');
-							if (partes.Length != 2)
-							{
-								MessageBox.Show($"Formato incorrecto en la línea: {linea}", "Error");
-								return false;
-							}
+		//		foreach(string linea in lineas)
+		//		{
+		//			if (linea.StartsWith("Capa"))
+		//			{
+		//				capaActual++;
+		//				neuronaActual = 0;
+		//				pesoActual = 0;
+		//			}
+		//			else if (linea.StartsWith("Peso"))
+		//			{
+		//				if (capas[capaActual].Tipo != Capa.TipoCapa.Entrada)
+		//				{
+		//					string[] partes = linea.Split('=');
+		//					if (partes.Length != 2)
+		//					{
+		//						MessageBox.Show($"Formato incorrecto en la línea: {linea}", "Error");
+		//						return false;
+		//					}
 
-							double peso = double.Parse(partes[1].Trim());
+		//					double peso = double.Parse(partes[1].Trim());
 
-							if (capaActual >= 0 && capaActual < Capas.Length && neuronaActual < Capas[capaActual].Neuronas.Length)
-							{
-								Capas[capaActual].Neuronas[neuronaActual].Pesos[pesoActual] = peso;
-								pesoActual++;
-								if (pesoActual >= Capas[capaActual].Neuronas[neuronaActual].Pesos.Length)
-								{
-									pesoActual = 0;
-									neuronaActual++;
-								}
-							}
-						}
-					}
-					else if (linea.StartsWith("Bias"))
-					{
-						if (Capas[capaActual].Tipo != Capa.TipoCapa.Entrada)
-						{
-							string[] partes = linea.Split('=');
-							if (partes.Length != 2)
-							{
-								MessageBox.Show($"Formato incorrecto en la línea: {linea}", "Error");
-								return false;
-							}
+		//					if (capaActual >= 0 && capaActual < capas.Length && neuronaActual < capas[capaActual].neuronas.Length)
+		//					{
+		//						capas[capaActual].neuronas[neuronaActual].Pesos[pesoActual] = peso;
+		//						pesoActual++;
+		//						if (pesoActual >= capas[capaActual].neuronas[neuronaActual].Pesos.Length)
+		//						{
+		//							pesoActual = 0;
+		//							neuronaActual++;
+		//						}
+		//					}
+		//				}
+		//			}
+		//			else if (linea.StartsWith("Bias"))
+		//			{
+		//				if (capas[capaActual].Tipo != Capa.TipoCapa.Entrada)
+		//				{
+		//					string[] partes = linea.Split('=');
+		//					if (partes.Length != 2)
+		//					{
+		//						MessageBox.Show($"Formato incorrecto en la línea: {linea}", "Error");
+		//						return false;
+		//					}
 
-							double sesgo = double.Parse(partes[1].Trim());
+		//					double sesgo = double.Parse(partes[1].Trim());
 
-							if (capaActual >= 0 && capaActual < Capas.Length && neuronaActual < Capas[capaActual].Neuronas.Length)
-							{
-								Capas[capaActual].Neuronas[neuronaActual].Bias = sesgo;
-								neuronaActual++;
-							}
-						}
-					}
-				}
+		//					if (capaActual >= 0 && capaActual < capas.Length && neuronaActual < capas[capaActual].neuronas.Length)
+		//					{
+		//						capas[capaActual].neuronas[neuronaActual].Bias = sesgo;
+		//						neuronaActual++;
+		//					}
+		//				}
+		//			}
+		//		}
 
-				MessageBox.Show("Configuración cargada correctamente.", "Perceptron");
-				return true;
-			}
-			catch (Exception e)
-			{
-				MessageBox.Show($"No se ha podido cargar la configuración.\nError:\n {e.Message}\nStackTrace:\n{e.StackTrace}");
-				return false;
-			}
-		}
+		//		MessageBox.Show("Configuración cargada correctamente.", "Perceptron");
+		//		return true;
+		//	}
+		//	catch (Exception e)
+		//	{
+		//		MessageBox.Show($"No se ha podido cargar la configuración.\nError:\n {e.Message}\nStackTrace:\n{e.StackTrace}");
+		//		return false;
+		//	}
+		//}
 
 		/// <summary>
 		/// Guarda los datos de configuración en un archivo
 		/// </summary>
-		public void GuardarDatos()
-		{
-			try
-			{
-				for(int c = 0; c < Capas.Length; c++)
-				{
-					archivo.EscribirArchivo($"Capa {c}:", VariablesGlobales.Configuracion + VariablesGlobales.FormatoArchivos);
+		//public void guardarDatos()
+		//{
+		//	try
+		//	{
+		//		for(int c = 0; c < capas.Length; c++)
+		//		{
+		//			archivo.EscribirArchivo($"Capa {c}:", VariablesGlobales.Configuracion + VariablesGlobales.FormatoArchivos);
 
-					for (int j = 0; j < Capas[c].Neuronas.Length ; j++)
-					{
-						for(int p = 0; p < Capas[c].Neuronas[j].Pesos.Length ; p++)
-						{
-							archivo.EscribirArchivo($"Peso = {Capas[c].Neuronas[j].Pesos[p]}", VariablesGlobales.Configuracion + VariablesGlobales.FormatoArchivos);
-						}
+		//			for (int j = 0; j < capas[c].neuronas.Length ; j++)
+		//			{
+		//				for(int p = 0; p < capas[c].neuronas[j].Pesos.Length ; p++)
+		//				{
+		//					archivo.EscribirArchivo($"Peso = {capas[c].neuronas[j].Pesos[p]}", VariablesGlobales.Configuracion + VariablesGlobales.FormatoArchivos);
+		//				}
 
-						archivo.EscribirArchivo($"Bias = {Capas[c].Neuronas[j].Bias}", VariablesGlobales.Configuracion + VariablesGlobales.FormatoArchivos);
-					}
-				}
+		//				archivo.EscribirArchivo($"Bias = {capas[c].neuronas[j].Bias}", VariablesGlobales.Configuracion + VariablesGlobales.FormatoArchivos);
+		//			}
+		//		}
 
-				MessageBox.Show("Se ha guardado la configuración correctamente.", "Perceptron");
-			}
-			catch (Exception e)
-			{
-				MessageBox.Show($"No se ha podido guardar la configuración.\nError:\n {e.Message}");
-			}
-		}
+		//		MessageBox.Show("Se ha guardado la configuración correctamente.", "Perceptron");
+		//	}
+		//	catch (Exception e)
+		//	{
+		//		MessageBox.Show($"No se ha podido guardar la configuración.\nError:\n {e.Message}");
+		//	}
+		//}
 	}
 }

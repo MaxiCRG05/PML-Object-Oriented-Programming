@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
 using static Perceptron_Multicapa_Colores.Capa;
 
 namespace Perceptron_Multicapa_Colores
@@ -12,70 +14,83 @@ namespace Perceptron_Multicapa_Colores
 		/// <summary>
 		/// Generador de números.
 		/// </summary>
-		readonly Random rand = new Random();
+		Random rand = new Random();
+
+		public int numPesos;
 
 		/// <summary>
 		/// Nombre de la neurona.
 		/// </summary>
-		public String Nombre { get; set; }
+		public string Nombre;
 
 		/// <summary>
 		/// Pesos de la neurona dependiendo de las entradas que reciba.
 		/// </summary>
-		public double[] Pesos { get; set; }
+		public List<double> w = new List<double>();
 
 		/// <summary>
 		/// Bias de la neurona.
 		/// </summary>
-		public double Bias { get; set; }
+		public double b;
 
 		/// <summary>
 		/// Delta (error) de la neurona.
 		/// </summary>
-		public double Delta { get; set; }
+		public double delta;
 
 		/// <summary>
 		/// Salida (predicción) de la neurona.
 		/// </summary>
-		public double Salida { get; set; }
+		public double a;
+
+		/// <summary>
+		/// Lista de neuronas de la capa siguiente.
+		/// </summary>
+		public List<Neurona> neuronasSiguientes = new List<Neurona>();
+
+		/// <summary>
+		/// Lista de neuronas de la capa anterior.
+		/// </summary>
+		public List<Neurona> neuronasAnteriores = new List<Neurona>();
 
 		/// <summary>
 		/// Constructor de la clase Neurona.
 		/// </summary>
 		/// <param name="nombre">Nombre de la neurona.</param>
 		/// <param name="numeroPesos">Número de pesos (conexiones con la capa anterior).</param>
-		public Neurona(String name, int numeroNeuronas, int numeroNeuronasCapaSiguiente, TipoCapa tipoCapa)
+		public Neurona(String name, int numNeuronas ,int numeroNeuronasCapaSiguiente, TipoCapa tipoCapa)
 		{
 			Nombre = name;
+			numPesos =  (tipoCapa == TipoCapa.Salida) ? numNeuronas : numeroNeuronasCapaSiguiente;
 
-			if (tipoCapa == TipoCapa.Entrada)
+			switch(tipoCapa)
 			{
-				Pesos = new double[numeroNeuronasCapaSiguiente];
+				case TipoCapa.Entrada:
+					inicializarPesos(numeroNeuronasCapaSiguiente);
+					break;
 
-				for (int i = 0; i < numeroNeuronasCapaSiguiente; i++)
-					Pesos[i] = rand.NextDouble();
-			}
-			else if (tipoCapa == TipoCapa.Oculta)
-			{
-				Pesos = new double[numeroNeuronas];
-
-				for (int i = 0; i < numeroNeuronas; i++)
-					Pesos[i] = rand.NextDouble();
-				IniciarBias();
-			}
-			else if (tipoCapa == TipoCapa.Salida)
-			{
-				Pesos = new double[numeroNeuronas];
-
-				for (int i = 0; i < numeroNeuronas; i++)
-					Pesos[i] = rand.NextDouble();
-				IniciarBias();
+				case TipoCapa.Oculta:
+					inicializarPesos(numeroNeuronasCapaSiguiente);
+					inicializarBias();
+					break;
+				case TipoCapa.Salida:
+					inicializarPesos(numNeuronas);
+					inicializarBias();
+					break;
 			}
 		}
 
-		private void IniciarBias()
+		private void inicializarPesos(int numNeuronas)
 		{
-			Bias = (double)new Random().NextDouble();
+			for (int i = 0; i < numNeuronas; i++)
+			{
+				w.Add(rand.NextDouble());
+			}
+		}
+
+		private void inicializarBias()
+		{
+			b = rand.NextDouble();
 		}
 	}
 }

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Drawing;
 using System.Linq;
+using System.IO.Ports;
 using System.Windows.Forms;
+using System.IO;
 
 namespace Perceptron_Multicapa_Colores
 {
@@ -10,6 +12,8 @@ namespace Perceptron_Multicapa_Colores
     /// </summary>
     public partial class Form1 : Form
     {
+		SerialPort ArduinoPort = new SerialPort();
+
 		/// <summary>
 		/// Instancia de la clase Archivos para manejar los archivos.
 		/// </summary>
@@ -18,7 +22,7 @@ namespace Perceptron_Multicapa_Colores
 		/// <summary>
 		/// Instancia de la clase PML para manejar el perceptrón multicapa.
 		/// </summary>
-		readonly PML perceptronMultiCapa;
+		readonly PML pml;
 
 		/// <summary>
 		/// Color seleccionado.
@@ -26,40 +30,69 @@ namespace Perceptron_Multicapa_Colores
 		public Color color;
 
 		/// <summary>
+		/// Variable que sirve para saber si el perceptrón ha sido entrenado.
+		/// </summary>
+		private bool entrenado = false;
+
+		/// <summary>
 		/// Constructor de la clase Form1.
 		/// </summary>
 		public Form1()
         {
-            perceptronMultiCapa = new PML(VariablesGlobales.n);
+            pml = new PML(VariablesGlobales.n);
 
             archivos = new Archivos(VariablesGlobales.Ruta);
             archivos.BuscarArchivo(VariablesGlobales.Datos + VariablesGlobales.FormatoArchivos);
 
             InitializeComponent();
 
-			if (archivos.BuscarArchivo(VariablesGlobales.Configuracion + VariablesGlobales.FormatoArchivos))
-            {
-                DialogResult dialog = MessageBox.Show($"El archivo, si se ha encontrado. ¿Deseas cargar los pesos?", caption: "Perceptron", buttons: MessageBoxButtons.YesNo);
-                if (dialog == DialogResult.Yes)
-                {
-                    perceptronMultiCapa.CargarDatos();
+			ArduinoPort.PortName = "COM9";
+			ArduinoPort.BaudRate = 9600;
 
-                    btnProbar.Enabled = true;
-                    button2.Enabled = false;
-                }
-            }
-            else
-            {
-                btnProbar.Enabled = false; 
-                button2.Enabled = true;    
-            }
+			//if (archivos.BuscarArchivo(VariablesGlobales.Configuracion + VariablesGlobales.FormatoArchivos))
+   //         {
+   //             DialogResult dialog = MessageBox.Show($"El archivo, si se ha encontrado. ¿Deseas cargar los pesos?", caption: "Perceptron", buttons: MessageBoxButtons.YesNo);
+   //             if (dialog == DialogResult.Yes)
+   //             {
+   //                 //pml.CargarDatos();
+
+   //                 btnProbar.Enabled = true;
+   //                 button2.Enabled = false;
+   //             }
+   //         }
+   //         else
+   //         {
+   //             btnProbar.Enabled = false; 
+   //             button2.Enabled = true;    
+   //         }
         }
 
-        private void Probar()
+        private void ActivarLed()
+        {
+            try
+            {
+                ArduinoPort.Open();
+
+                ArduinoPort.Write(color.ToString());
+
+			}
+            catch(IOException e)
+            {
+                Console.WriteLine($"Error: {e.Message}");
+            }
+            finally
+            {
+                if (ArduinoPort.IsOpen)
+                    ArduinoPort.Close();
+            }
+		}
+
+
+		private void Probar()
         {
 			double[] entradas = { color.R, color.G, color.B };
 
-			double[] salida = perceptronMultiCapa.Propagacion(entradas);
+			double[] salida = pml.propagacion(entradas);
 
 			int clasePredicha = Array.IndexOf(salida, salida.Max());
 
@@ -67,7 +100,9 @@ namespace Perceptron_Multicapa_Colores
 
 			label2.Text = $"{nombreColor}";
 			archivos.EscribirArchivo($"[{color.R}, {color.G}, {color.B}]\t Predicción: {nombreColor}", VariablesGlobales.Datos + VariablesGlobales.FormatoArchivos);
-		}
+
+            MessageBox.Show($"Predicción: {nombreColor}", "Predicción");
+        }
 
 		/// <summary>
 		/// Método para probar el perceptrón multicapa y poder predecir el resultado.
@@ -76,8 +111,11 @@ namespace Perceptron_Multicapa_Colores
 		/// <param name="e"></param>
 		private void btnProbar_Click(object sender, EventArgs e)
         {
-            Probar();    
-        }
+			if (entrenado)
+			{
+				Probar();
+			}
+		}
 
 		/// <summary>
 		/// Método para guardar los pesos del perceptrón multicapa.
@@ -86,7 +124,7 @@ namespace Perceptron_Multicapa_Colores
 		/// <param name="e"></param>
 		private void btnGuardar_MouseClick(object sender, MouseEventArgs e)
         {
-            perceptronMultiCapa.GuardarDatos();  
+            //pml.GuardarDatos();  
         }
 
 		/// <summary>
@@ -169,9 +207,9 @@ namespace Perceptron_Multicapa_Colores
 		private void button2_MouseClick(object sender, MouseEventArgs e)
         {
             button2.Enabled = false;
-            perceptronMultiCapa.Entrenar();
+            pml.entrenar();
             btnProbar.Enabled = true;
-
+            entrenado = true;
         }
 
 		/// <summary>
@@ -188,7 +226,8 @@ namespace Perceptron_Multicapa_Colores
                 int y = e.Y * bitmap.Height / pictureBox1.ClientSize.Height;
                 color = bitmap.GetPixel(x, y);
                 registroColores.Text += $"R: {color.R} \tG: {color.G} \tB: {color.B}\n";
-            }
+				//ActivarLed();
+			}
             else
             {
                 MessageBox.Show("No hay imagen cargada en el PictureBox.");
@@ -208,7 +247,10 @@ namespace Perceptron_Multicapa_Colores
 
 		private void pictureBox1_MouseDoubleClick(object sender, MouseEventArgs e)
 		{
-            Probar();
+            if(entrenado)
+            {
+				Probar();
+			}
 		}
 	}
 }
